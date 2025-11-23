@@ -26,7 +26,7 @@ public class App {
                         LedgerUtilities.addTransaction();
                         break;
                     case "2":
-                        System.out.println("editing transaction");
+                        LedgerUtilities.editTransaction();
                         break;
                     case "3":
                         System.out.println("deleting transaction");
