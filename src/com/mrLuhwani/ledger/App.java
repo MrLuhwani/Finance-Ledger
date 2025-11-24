@@ -17,7 +17,7 @@ public class App {
                         2.Edit transaction
                         3.Delete transaction
                         4.Show monthly summary
-                        5.Export to CSV
+                        5.Show Transaction History
                         0.Exit
                         Response: """);
                 response = scanner.next();
@@ -35,7 +35,7 @@ public class App {
                         System.out.println("monthly transaction");
                         break;
                     case "5":
-                        System.out.println("exporting transaction");
+                        System.out.println("5.Show Transaction History");
                         break;
                     case "0":
                         System.out.println("Exiting program...");
