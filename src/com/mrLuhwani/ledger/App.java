@@ -29,7 +29,7 @@ public class App {
                         LedgerUtilities.editTransaction();
                         break;
                     case "3":
-                        System.out.println("deleting transaction");
+                        LedgerUtilities.deleteTransaction();
                         break;
                     case "4":
                         System.out.println("monthly transaction");

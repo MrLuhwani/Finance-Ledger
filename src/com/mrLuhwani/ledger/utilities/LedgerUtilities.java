@@ -36,20 +36,12 @@ public class LedgerUtilities {
         try (BufferedReader bReader = new BufferedReader(new FileReader(ledgerPath))) {
             String[] column;
             String line;
-            String header = "S/N,Date,Amount,Category,Description";
+            String header = "ID,Date,Amount,Category,Description";
             while ((line = bReader.readLine()) != null) {
                 if (!line.equals(header)) {
                     column = line.split(",");
                     id = Integer.parseInt(column[0]);
                     date = LocalDate.parse(column[1], formatter);
-                    /*
-                    java.time.format.DateTimeParseException: Text '2023-11-12' could not be parsed at index 2
-        at java.base/java.time.format.DateTimeFormatter.parseResolved0(DateTimeFormatter.java:2108)
-        at java.base/java.time.format.DateTimeFormatter.parse(DateTimeFormatter.java:2010)
-        at java.base/java.time.LocalDate.parse(LocalDate.java:437)
-        at com.mrLuhwani.ledger.utilities.LedgerUtilities.<clinit>(LedgerUtilities.java:44)        
-        at com.mrLuhwani.ledger.App.main(App.java:29)
-                     */
                     amount = Math.abs(Double.parseDouble(column[2]));
 
                     if (column[2].startsWith("-")) {
@@ -84,7 +76,7 @@ public class LedgerUtilities {
                 } catch (DateTimeParseException e) {
                     System.out.println("Invalid date format!");
                 } catch (Exception e) {
-                    System.out.println("Something went wrong!");
+                    e.printStackTrace();
                 }
             }
             System.out.println("Modify the fields as needed: ");
@@ -98,7 +90,7 @@ public class LedgerUtilities {
                     isIncome = false;
                     break;
                 } else {
-                    System.err.println("Invalid input!");
+                    System.out.println("Invalid input!");
                 }
             }
             while (true) {
@@ -114,7 +106,7 @@ public class LedgerUtilities {
                     scanner.nextLine();
                     System.out.println("Invalid input!");
                 } catch (Exception e) {
-                    System.out.println("Something went wrong");
+                    e.printStackTrace();
                 }
             }
             scanner.nextLine();
@@ -144,8 +136,8 @@ public class LedgerUtilities {
 
     protected static void sortDatesAndIds() {
         transactions.sort(Comparator.comparing(Transaction::getDate).reversed());
-        for (Transaction t : transactions) {
-            t.setId(id);
+        for (Transaction tr : transactions) {
+            tr.setId(id);
             id++;
         }
     }
@@ -165,16 +157,26 @@ public class LedgerUtilities {
 
     }
 
-    protected static void csvWriter(Transaction t, boolean isNew) {
+    protected static void csvEditor(Transaction t, boolean isNew, boolean del) {
+        String targetId = String.valueOf(t.getId());
         String amt;
-        if (t.getIsIncome() == false) {
-            amt = "-" + String.valueOf(t.getAmount());
-        } else {
-            amt = String.valueOf(t.getAmount());
+        String id;
+        String date;
+        ArrayList<String> row = new ArrayList<>();
+        if (!del) {
+            if (t.getIsIncome() == false) {
+                amt = "-" + String.valueOf(t.getAmount());
+            } else {
+                amt = String.valueOf(t.getAmount());
+            }
+            id = String.valueOf(t.getId());
+            date = t.getDate().format(formatter);
+            row.add(id);
+            row.add(date);
+            row.add(amt);
+            row.add(t.getCategory());
+            row.add(t.getDescription());
         }
-        String id = String.valueOf(t.getId());
-        String date = t.getDate().toString();
-        String[] row = { id, date, amt, t.getCategory(), t.getDescription() };
         if (isNew) {
             try (BufferedWriter bWriter = new BufferedWriter(new FileWriter(ledgerPath, true))) {
                 bWriter.append("\n");
@@ -187,17 +189,25 @@ public class LedgerUtilities {
                 e.printStackTrace();
             }
         } else {
-            String targetId = String.valueOf(id);
             ArrayList<String> updatedLines = new ArrayList<>();
             String[] columns;
             String ln;
             try (BufferedReader bReader = new BufferedReader(new FileReader(ledgerPath))) {
-                while ((ln = bReader.readLine()) != null) {
-                    columns = ln.split(",");
-                    if (columns[0] == targetId) {
-                        updatedLines.add(String.join(",", row));
-                    } else {
-                        updatedLines.add(ln);
+                if (del) {
+                    while ((ln = bReader.readLine()) != null) {
+                        columns = ln.split(",");
+                        if (columns[0] != targetId) {
+                            updatedLines.add(ln);
+                        }
+                    }
+                } else {
+                    while ((ln = bReader.readLine()) != null) {
+                        columns = ln.split(",");
+                        if (columns[0] == targetId) {
+                            updatedLines.add(String.join(",", row));
+                        } else {
+                            updatedLines.add(ln);
+                        }
                     }
                 }
             } catch (FileNotFoundException e) {
@@ -225,7 +235,7 @@ public class LedgerUtilities {
     public static void addTransaction() {
         getTransactionDetails();
         newOrOldT(true, -1);
-        csvWriter(t, true);
+        csvEditor(t, true, false);
         System.out.println("Successfully added new transaction!");
     }
 
@@ -279,9 +289,44 @@ public class LedgerUtilities {
             }
             getTransactionDetails();
             newOrOldT(false, index);
+            csvEditor(t, false, false);
             System.out.println("Successfully edited transaction!");
-            csvWriter(t, false);
         }
     }
 
+    public static void deleteTransaction() {
+        int rows = getCSV();
+        if (rows == 1) {
+            System.out.println("No transactions in CSV");
+        } else {
+            boolean validId = false;
+            int index = 0;
+            while (!validId) {
+                try {
+                    System.out.print("Enter the id of the transaction you wish to delete: ");
+                    id = scanner.nextInt();
+                    for (int i = 0; i < transactions.size(); i++) {
+                        if (transactions.get(i).getId() == id) {
+                            index = i;
+                            validId = true;
+                            break;
+                        }
+                    }
+                    if (!validId) {
+                        System.out.println("Invalid id!");
+                    }
+                } catch (InputMismatchException e) {
+                    scanner.nextLine();
+                    System.out.println("Invalid input!");
+                } catch (Exception e) {
+                    System.out.println("Something went wrong!");
+                }
+                scanner.nextLine();
+            }
+            t = transactions.remove(index);
+            sortDatesAndIds();
+            csvEditor(t, false, true);
+            System.out.println("Transaction successfully deleted");
+        }
+    }
 }
