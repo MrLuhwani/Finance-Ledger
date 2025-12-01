@@ -7,11 +7,14 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.time.LocalDate;
+import java.time.Month;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.time.format.TextStyle;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
@@ -19,7 +22,6 @@ import com.mrLuhwani.ledger.transactionModel.Transaction;
 
 public class LedgerUtilities {
     static Scanner scanner = new Scanner(System.in);
-    static int id;
     static LocalDate date;
     static String type;
     static boolean isIncome;
@@ -36,20 +38,18 @@ public class LedgerUtilities {
         try (BufferedReader bReader = new BufferedReader(new FileReader(ledgerPath))) {
             String[] column;
             String line;
-            String header = "ID,Date,Amount,Category,Description";
+            String header = "ID,Date,Amount(₦),Category,Description";
             while ((line = bReader.readLine()) != null) {
                 if (!line.equals(header)) {
                     column = line.split(",");
-                    id = Integer.parseInt(column[0]);
-                    date = LocalDate.parse(column[1], formatter);
                     amount = Math.abs(Double.parseDouble(column[2]));
-
                     if (column[2].startsWith("-")) {
                         isIncome = false;
                     } else {
                         isIncome = true;
                     }
-                    transactions.add(new Transaction(id, date, amount, isIncome, column[3], column[4]));
+                    transactions.add(new Transaction(Integer.parseInt(column[0]), LocalDate.parse(column[1], formatter),
+                            amount, isIncome, column[3], column[4]));
                 }
             }
         } catch (FileNotFoundException e) {
@@ -61,7 +61,7 @@ public class LedgerUtilities {
         }
     }
 
-    protected static void getTransactionDetails() {
+    private static void getTransactionDetails() {
         try {
             while (true) {
                 try {
@@ -134,112 +134,65 @@ public class LedgerUtilities {
 
     }
 
-    protected static void sortDatesAndIds() {
+    private static void sortDatesAndIds() {
         transactions.sort(Comparator.comparing(Transaction::getDate).reversed());
+        int id = 1;
         for (Transaction tr : transactions) {
             tr.setId(id);
             id++;
         }
     }
 
-    protected static void newOrOldT(boolean isNewTransaction, int index) {
+    private static void newOrOldT(boolean isNewTransaction, int index) {
         if (isNewTransaction && index == -1) {
-            id = 1;
-            t = new Transaction(id, date, amount, isIncome, category, description);
+            t = new Transaction(0, date, amount, isIncome, category, description);
             transactions.add(t);
             sortDatesAndIds();
         } else {
-            id = 1;
-            t = new Transaction(id, date, amount, isIncome, category, description);
+            t = new Transaction(0, date, amount, isIncome, category, description);
             transactions.set(index, t);
             sortDatesAndIds();
         }
 
     }
 
-    protected static void csvEditor(Transaction t, boolean isNew, boolean del) {
-        String targetId = String.valueOf(t.getId());
-        String amt;
-        String id;
-        String date;
-        ArrayList<String> row = new ArrayList<>();
-        if (!del) {
-            if (t.getIsIncome() == false) {
-                amt = "-" + String.valueOf(t.getAmount());
-            } else {
-                amt = String.valueOf(t.getAmount());
-            }
-            id = String.valueOf(t.getId());
-            date = t.getDate().format(formatter);
-            row.add(id);
-            row.add(date);
-            row.add(amt);
-            row.add(t.getCategory());
-            row.add(t.getDescription());
-        }
-        if (isNew) {
-            try (BufferedWriter bWriter = new BufferedWriter(new FileWriter(ledgerPath, true))) {
-                bWriter.append("\n");
-                bWriter.append(String.join(",", row));
-            } catch (FileNotFoundException e) {
-                System.out.println("Invalid file path");
-            } catch (IOException e) {
-                System.out.println("Something went wrong!");
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        } else {
-            ArrayList<String> updatedLines = new ArrayList<>();
-            String[] columns;
-            String ln;
-            try (BufferedReader bReader = new BufferedReader(new FileReader(ledgerPath))) {
-                if (del) {
-                    while ((ln = bReader.readLine()) != null) {
-                        columns = ln.split(",");
-                        if (columns[0] != targetId) {
-                            updatedLines.add(ln);
-                        }
-                    }
-                } else {
-                    while ((ln = bReader.readLine()) != null) {
-                        columns = ln.split(",");
-                        if (columns[0] == targetId) {
-                            updatedLines.add(String.join(",", row));
-                        } else {
-                            updatedLines.add(ln);
-                        }
-                    }
+    private static void csvEditor() {
+        String strId;
+        try (BufferedWriter bWriter = new BufferedWriter(new FileWriter(ledgerPath))) {
+            String header = "ID,Date,Amount(₦),Category,Description";
+            String strDate;
+            String strAmt;
+            bWriter.write(header);
+            bWriter.write("\n");
+            for (Transaction tr : transactions) {
+                strId = String.valueOf(tr.getId());
+                strDate = tr.getDate().format(formatter);
+                strAmt = String.valueOf(tr.getAmount());
+                if (!tr.getIsIncome()) {
+                    strAmt = "-" + strAmt;
                 }
-            } catch (FileNotFoundException e) {
-                System.out.println("Invalid file path");
-            } catch (IOException e) {
-                System.out.println("Something went wrong");
-            } catch (Exception e) {
-                e.printStackTrace();
+                String[] row = { strId, strDate, strAmt, tr.getCategory(), tr.getDescription() };
+                bWriter.write(String.join(",", row));
+                bWriter.write("\n");
             }
-            try (BufferedWriter bWriter = new BufferedWriter(new FileWriter(ledgerPath))) {
-                for (String st : updatedLines) {
-                    bWriter.append(st);
-                    bWriter.append("\n");
-                }
-            } catch (FileNotFoundException e) {
-                System.out.println("Invalid file path");
-            } catch (IOException e) {
-                System.out.println("Something went wrong");
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+        } catch (FileNotFoundException e) {
+            System.out.println("Invalid file path");
+        } catch (IOException e) {
+            System.out.println("Something went wrong");
+        } catch (Exception e) {
+            e.printStackTrace();
         }
+
     }
 
     public static void addTransaction() {
         getTransactionDetails();
         newOrOldT(true, -1);
-        csvEditor(t, true, false);
+        csvEditor();
         System.out.println("Successfully added new transaction!");
     }
 
-    protected static int getCSV() {
+    public static int getCSV() {
         String line;
         int rows = 0;
         try (BufferedReader bReader = new BufferedReader(new FileReader(ledgerPath))) {
@@ -259,7 +212,20 @@ public class LedgerUtilities {
     }
 
     public static void editTransaction() {
-        int rows = getCSV();
+        int rows = 0;
+        try (BufferedReader bReader = new BufferedReader(new FileReader(ledgerPath))) {
+            String ln;
+            while ((ln = bReader.readLine()) != null) {
+                rows++;
+            }
+        } catch (FileNotFoundException e) {
+            System.out.println("Invalid file path");
+        } catch (IOException e) {
+            System.out.println("Something went wrong");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        int id;
         if (rows == 1) {
             System.out.println("No transactions in CSV");
         } else {
@@ -279,23 +245,37 @@ public class LedgerUtilities {
                     if (!validId) {
                         System.out.println("Invalid id!");
                     }
+
                 } catch (InputMismatchException e) {
                     scanner.nextLine();
                     System.out.println("Invalid input!");
                 } catch (Exception e) {
-                    System.out.println("Something went wrong!");
+                    e.printStackTrace();
                 }
-                scanner.nextLine();
             }
+            scanner.nextLine();
             getTransactionDetails();
             newOrOldT(false, index);
-            csvEditor(t, false, false);
+            csvEditor();
             System.out.println("Successfully edited transaction!");
         }
     }
 
     public static void deleteTransaction() {
-        int rows = getCSV();
+        int rows = 0;
+        try (BufferedReader bReader = new BufferedReader(new FileReader(ledgerPath))) {
+            String ln;
+            while ((ln = bReader.readLine()) != null) {
+                rows++;
+            }
+        } catch (FileNotFoundException e) {
+            System.out.println("Invalid file path");
+        } catch (IOException e) {
+            System.out.println("Something went wrong");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        int id;
         if (rows == 1) {
             System.out.println("No transactions in CSV");
         } else {
@@ -315,18 +295,110 @@ public class LedgerUtilities {
                     if (!validId) {
                         System.out.println("Invalid id!");
                     }
+
                 } catch (InputMismatchException e) {
                     scanner.nextLine();
                     System.out.println("Invalid input!");
                 } catch (Exception e) {
-                    System.out.println("Something went wrong!");
+                    e.printStackTrace();
                 }
-                scanner.nextLine();
             }
-            t = transactions.remove(index);
+            transactions.remove(index);
             sortDatesAndIds();
-            csvEditor(t, false, true);
-            System.out.println("Transaction successfully deleted");
+            csvEditor();
+            System.out.println("Deletion Successfully!");
+        }
+    }
+
+    public static void monthlySummary() {
+        int rows = 0;
+        try (BufferedReader bReader = new BufferedReader(new FileReader(ledgerPath))) {
+            String ln;
+            while ((ln = bReader.readLine()) != null) {
+                rows++;
+            }
+        } catch (FileNotFoundException e) {
+            System.out.println("Invalid file path");
+        } catch (IOException e) {
+            System.out.println("Something went wrong");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        if (rows == 1) {
+            System.out.println("No transactions in CSV");
+        } else {
+            int currentYear = LocalDate.now().getYear();
+            int monthNum;
+            while (true) {
+                try {
+                    System.out.print("Enter the number of the monthNum you wish to check (1-12): ");
+                    monthNum = scanner.nextInt();
+                    if (1 <= monthNum && monthNum <= 12) {
+                        break;
+                    } else {
+                        System.out.println("Invalid month input!");
+                    }
+                } catch (InputMismatchException e) {
+                    scanner.nextLine();
+                    System.out.println("Invalid input!");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+            scanner.nextLine();
+            String[] column;
+            ArrayList<String> monthRecords = new ArrayList<>();
+            ArrayList<Transaction> recordObjects = new ArrayList<>();
+            String ln;
+            try (BufferedReader bReader = new BufferedReader(new FileReader(ledgerPath))) {
+                bReader.readLine();
+                while ((ln = bReader.readLine()) != null) {
+                    column = ln.split(",");
+                    LocalDate date = LocalDate.parse(column[1], formatter);
+                    if (date.getMonthValue() == monthNum && date.getYear() == currentYear) {
+                        monthRecords.add(ln);
+                        amount = Math.abs(Double.parseDouble(column[2]));
+                        if (column[2].startsWith("-")) {
+                            isIncome = false;
+                        } else {
+                            isIncome = true;
+                        }
+                        recordObjects.add(new Transaction(Integer.parseInt(column[0]),
+                                LocalDate.parse(column[1], formatter), amount, isIncome, column[3], column[4]));
+                    }
+                }
+            } catch (FileNotFoundException e) {
+                System.out.println("Invalid file path");
+            } catch (IOException e) {
+                System.out.println("Something went wrong");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            if (monthRecords.isEmpty()) {
+                System.out.println("No records for this month!");
+            } else {
+                String monthName = Month.of(monthNum).getDisplayName(TextStyle.FULL, Locale.ENGLISH);
+                System.out.println("Summary for the Month of " + monthName + ": ");
+                System.out.println("ID,Date,Amount(₦),Category,Description");
+                for (String str : monthRecords) {
+                    System.out.println(str);
+                }
+                double expense = 0;
+                double income = 0;
+                for (Transaction tr : recordObjects) {
+                    if (tr.getIsIncome() == true) {
+                        income += tr.getAmount();
+                    } else {
+                        expense += tr.getAmount();
+                    }
+                }
+                System.out.println("Total income: " + income);
+                System.out.println("Total Expense: " + expense);
+                double net = income - expense;
+                System.out.println("Net Profit: " + net);
+                System.out.println("Summary Complete");
+            }
         }
     }
 }

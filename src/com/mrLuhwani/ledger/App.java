@@ -13,37 +13,25 @@ public class App {
                 String response;
                 System.out.print("""
                         Enter the number for what you want to choose
-                        1.Add transaction
-                        2.Edit transaction
-                        3.Delete transaction
-                        4.Show monthly summary
-                        5.Show Transaction History
+                        1.Show Transaction History
+                        2.Add transaction
+                        3.Edit transaction
+                        4.Delete transaction
+                        5.Show monthly summary
                         0.Exit
                         Response: """);
                 response = scanner.next();
                 switch (response) {
-                    case "1":
-                        LedgerUtilities.addTransaction();
-                        break;
-                    case "2":
-                        LedgerUtilities.editTransaction();
-                        break;
-                    case "3":
-                        LedgerUtilities.deleteTransaction();
-                        break;
-                    case "4":
-                        System.out.println("monthly transaction");
-                        break;
-                    case "5":
-                        System.out.println("5.Show Transaction History");
-                        break;
-                    case "0":
-                        System.out.println("Exiting program...");
+                    case "1" -> LedgerUtilities.getCSV();
+                    case "2" -> LedgerUtilities.addTransaction();
+                    case "3" -> LedgerUtilities.editTransaction();
+                    case "4" -> LedgerUtilities.deleteTransaction();
+                    case "5" -> LedgerUtilities.monthlySummary();
+                    case "0" -> {
                         usingSystem = false;
-                        break;
-                    default:
-                        System.out.println("Invalid input");
-                        break;
+                        System.out.println("Exiting program...");
+                    }
+                    default -> System.out.println("Invalid input");
                 }
             }
         } catch (Exception e) {

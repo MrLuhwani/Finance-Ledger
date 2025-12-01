@@ -47,24 +47,4 @@ public class Transaction {
     public void setId(int id) {
         this.id = id;
     }
-
-    public void setDate(LocalDate date) {
-        this.date = date;
-    }
-
-    public void setAmount(double amount) {
-        this.amt = amount;
-    }
-
-    public void setIsIncome(boolean isIncome) {
-        this.isIncome = isIncome;
-    }
-
-    public void setCategory(String category) {
-        this.category = category;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
 }
