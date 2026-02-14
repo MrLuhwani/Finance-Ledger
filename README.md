@@ -18,20 +18,19 @@ It allows you to track income & expenses, update transactions, delete entries, a
 ---
 
 ## Project Structure
-FinanceLedger/
-├── src/
-│   └── com/
-│       └── mrLuhwani/
-│           └── ledger/
-│               ├── App.java
-│               ├── transactionModel/
-│               │   └── Transaction.java
-│               └── utilities/
-│                   └── LedgerUtils.java
-├── ledger.csv
-├── README.md
+FinanceLedger/  
+├── src/  
+│   └── com/  
+│       └── mrLuhwani/  
+│           └── ledger/  
+│               ├── App.java  
+│               ├── transactionModel/  
+│               │   └── Transaction.java  
+│               └── utilities/  
+│                   └── LedgerUtils.java  
+├── ledger.csv  
+├── README.md  
 └── .gitignore
-
 ---
 
 ## How It Works
