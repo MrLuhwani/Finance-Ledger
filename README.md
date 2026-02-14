@@ -35,12 +35,15 @@ FinanceLedger
 │  │     │        └─ ledger/  
 │  │     │           ├─ models/  
 │  │     │           │  └─ Transaction.java  
+│  │     │           ├─ servicess/  
+│  │     │           │  └─ Utils.java  
 │  │     │           ├─ utilities/  
 │  │     │           │  ├─ CsvUtils.java  
 │  │     │           │  └─ LedgerUtils.java  
 │  │     │           └─ App.java  
 │  │     └─ resources/  
 │  │         └─ ledger.csv  
+│  │         └─ schema.sql
 │  └── pom.xml  
 ├─ .gitignore  
 └─ README.md  
