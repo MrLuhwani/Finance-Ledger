@@ -1,4 +1,4 @@
-package com.mrLuhwani.ledger.transactionModel;
+package dev.luhwani.ledger.models;
 
 import java.time.LocalDate;
 

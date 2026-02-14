@@ -1,9 +1,9 @@
-package com.mrLuhwani.ledger;
+package dev.luhwani.ledger;
 
 import java.util.Scanner;
 
-import com.mrLuhwani.ledger.utilities.CsvUtils;
-import com.mrLuhwani.ledger.utilities.LedgerUtils;
+import dev.luhwani.ledger.utilities.CsvUtils;
+import dev.luhwani.ledger.utilities.LedgerUtils;
 
 public class App {
     public static void main(String[] args) throws Exception {

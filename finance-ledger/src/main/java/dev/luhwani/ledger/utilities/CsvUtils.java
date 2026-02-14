@@ -1,4 +1,4 @@
-package com.mrLuhwani.ledger.utilities;
+package dev.luhwani.ledger.utilities;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
-import com.mrLuhwani.ledger.transactionModel.Transaction;
+import dev.luhwani.ledger.models.Transaction;
 
 public class CsvUtils {
 
@@ -31,7 +31,7 @@ public class CsvUtils {
                     } else {
                         isIncome = true;
                     }
-                    com.mrLuhwani.ledger.utilities.LedgerUtils.transactions
+                    LedgerUtils.transactions
                             .add(new Transaction(Integer.parseInt(column[0]), LocalDate.parse(column[1], formatter),
                                     amount, isIncome, column[3], column[4]));
                 }
@@ -77,7 +77,7 @@ public class CsvUtils {
             String strAmt;
             bWriter.write(header);
             bWriter.write("\n");
-            for (Transaction tr : com.mrLuhwani.ledger.utilities.LedgerUtils.transactions) {
+            for (Transaction tr : LedgerUtils.transactions) {
                 strId = String.valueOf(tr.getId());
                 strDate = tr.getDate().format(formatter);
                 strAmt = String.valueOf(tr.getAmount());

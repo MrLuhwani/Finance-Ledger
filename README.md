@@ -1,51 +1,52 @@
 # Finance Ledger (Java CLI)
-This is my first major project using Java.
-A simple command-line personal finance ledger built in Java.  
-It allows you to track income & expenses, update transactions, delete entries, and generate monthly summaries — all stored in a CSV file.
+A simple command-line personal finance ledger built in Java.
+It allows multiple users to track income & expenses, update transactions, filter expenses, delete entries, and generate monthly summaries.
+The ledger can also be exported in a csv
 
 ---
 
-## Features
+## Current Features  
 - Add new transactions  
 - Edit existing transactions  
 - Delete transactions  
 - View entire CSV ledger  
 - Auto-sorted by date (newest dates are on top)  
-- Auto-generated serial IDs  
 - Monthly income/expense summary  
 - CSV persistence using a static initializer block  
 
 ---
 
-## Project Structure
-FinanceLedger/  
-├── src/  
-│   └── com/  
-│       └── mrLuhwani/  
-│           └── ledger/  
-│               ├── App.java  
-│               ├── transactionModel/  
-│               │   └── Transaction.java  
-│               └── utilities/  
-│                   └── LedgerUtils.java  
-├── ledger.csv  
-├── README.md  
-└── .gitignore
+## Planned Features  
+- Supporting multiple users
+- Filter by different criteria
+- Persistence with DB
+- Export to csv
+
 ---
 
-## How It Works
-- All transactions are loaded from `ledger.csv` at startup.  
-- Transactions are stored in a dynamic `ArrayList`.  
-- IDs are regenerated after each change to maintain serial order.  
-- Dates are validated to prevent future entries.  
-- CSV file rewrites fully after each update (simple & safe).  
-
+## Project Structure
+FinanceLedger  
+├─ finance-ledger/  
+│  ├─ src/  
+│  │  └─ main/  
+│  │     ├─ java/  
+│  │     │  └─ dev/  
+│  │     │     └─ luhwani/  
+│  │     │        └─ ledger/  
+│  │     │           ├─ models/  
+│  │     │           │  └─ Transaction.java  
+│  │     │           ├─ utilities/  
+│  │     │           │  ├─ CsvUtils.java  
+│  │     │           │  └─ LedgerUtils.java  
+│  │     │           └─ App.java  
+│  │     └─ resources/  
+│  │         └─ ledger.csv  
+│  └── pom.xml  
+├─ .gitignore  
+└─ README.md  
 ---
 
 ## Future Improvements
-- Replace static methods with proper OOP services  
 - Add unit tests  
-- Reduce load on `LedgerUtils`  
-- Support JSON or SQLite database  
-- Add filtering/search  
-- Adding a GUI
+- Integrate Spring boot
+- Add a frontend or UI

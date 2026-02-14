@@ -1,4 +1,4 @@
-package com.mrLuhwani.ledger.utilities;
+package dev.luhwani.ledger.utilities;
 
 import java.io.IOException;
 import java.io.BufferedReader;
@@ -16,7 +16,7 @@ import java.util.Locale;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
-import com.mrLuhwani.ledger.transactionModel.Transaction;
+import dev.luhwani.ledger.models.Transaction;
 
 public class LedgerUtils {
 
