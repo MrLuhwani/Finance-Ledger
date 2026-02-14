@@ -1,0 +1,22 @@
+-- this is the schema for my postgresql tables
+
+CREATE TABLE IF NOT EXIST users(
+    id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    email VARCHAR(50) UNIQUE NOT NULL,
+    username VARCHAR(20) UNIQUE NOT NULL,
+    password_hash BYTEA NOT NULL,
+    password_salt VARCHAR(10) NOT NULL,
+    transaction_id BIGINT REFERENCES transactions(id),
+    created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE IF NOT EXISTS transactions(
+    id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    date DATE NOT NULL,
+    koboAmt BIGINT NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL,
+    entry_type VARCHAR(10) NOT NULL CHECK (entry_type IN ("INCOME", "EXPENSE")),
+    category TEXT NOT NULL, 
+    description VARCHAR(255) NOT NULL,
+    user_id REFERENCES users(id)
+);

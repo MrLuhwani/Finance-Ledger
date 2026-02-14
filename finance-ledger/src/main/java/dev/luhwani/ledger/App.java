@@ -52,7 +52,7 @@ public class App {
                     // run the login method
                 }
                 case "2" -> {
-                    // run the create acct method
+                    
                 }
                 case "3" -> {
                     scanner.close();
