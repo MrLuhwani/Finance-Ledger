@@ -27,7 +27,7 @@ FinanceLedger/
 │               ├── transactionModel/
 │               │   └── Transaction.java
 │               └── utilities/
-│                   └── LedgerUtilities.java
+│                   └── LedgerUtils.java
 ├── ledger.csv
 ├── README.md
 └── .gitignore
@@ -46,7 +46,7 @@ FinanceLedger/
 ## Future Improvements
 - Replace static methods with proper OOP services  
 - Add unit tests  
-- Reduce load on `LedgerUtilities`  
+- Reduce load on `LedgerUtils`  
 - Support JSON or SQLite database  
 - Add filtering/search  
 - Adding a GUI

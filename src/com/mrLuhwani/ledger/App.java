@@ -2,7 +2,8 @@ package com.mrLuhwani.ledger;
 
 import java.util.Scanner;
 
-import com.mrLuhwani.ledger.utilities.LedgerUtilities;
+import com.mrLuhwani.ledger.utilities.CsvUtils;
+import com.mrLuhwani.ledger.utilities.LedgerUtils;
 
 public class App {
     public static void main(String[] args) throws Exception {
@@ -22,11 +23,11 @@ public class App {
                         Response: """);
                 response = scanner.next();
                 switch (response) {
-                    case "1" -> LedgerUtilities.getCSV();
-                    case "2" -> LedgerUtilities.addTransaction();
-                    case "3" -> LedgerUtilities.editTransaction();
-                    case "4" -> LedgerUtilities.deleteTransaction();
-                    case "5" -> LedgerUtilities.monthlySummary();
+                    case "1" -> CsvUtils.getCSV();
+                    case "2" -> LedgerUtils.addTransaction();
+                    case "3" -> LedgerUtils.editTransaction();
+                    case "4" -> LedgerUtils.deleteTransaction();
+                    case "5" -> LedgerUtils.monthlySummary();
                     case "0" -> {
                         usingSystem = false;
                         System.out.println("Exiting program...");
