@@ -35,7 +35,10 @@ FinanceLedger
 │  │     │        └─ ledger/  
 │  │     │           ├─ models/  
 │  │     │           │  └─ Transaction.java  
-│  │     │           ├─ servicess/  
+│  │     │           ├─ repos/  
+│  │     │           │  └─ UserRepo.java  
+│  │     │           ├─ services/  
+│  │     │           │  ├─ UserServices.java  
 │  │     │           │  └─ Utils.java  
 │  │     │           ├─ utilities/  
 │  │     │           │  ├─ CsvUtils.java  
