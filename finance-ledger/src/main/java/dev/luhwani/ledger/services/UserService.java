@@ -24,7 +24,7 @@ public class UserService {
         }
     }
 
-    public Optional<User> createNewAcct(LoginData loginData) {
+    public Optional<User> createUser(LoginData loginData) {
         try {
             Optional<Long> userId = repo.registerUser(loginData);
             if (userId.isPresent()) {
