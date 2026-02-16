@@ -6,7 +6,6 @@ CREATE TABLE IF NOT EXIST users(
     username VARCHAR(20) UNIQUE NOT NULL,
     password_hash BYTEA NOT NULL,
     password_salt VARCHAR(10) NOT NULL,
-    transaction_id BIGINT REFERENCES transactions(id),
     created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
