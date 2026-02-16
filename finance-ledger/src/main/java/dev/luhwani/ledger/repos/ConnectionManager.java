@@ -26,7 +26,7 @@ public class ConnectionManager {
      * of the query. So run this once to create your tables, then you can delete the
      * call from main
      */
-    public static void initDB() throws SQLException, IOException {
+    static void initDB() throws SQLException, IOException {
         Connection conn = getConnection();
         Statement stmt = conn.createStatement();
         String sql = Files.readString(Paths.get("finance-ledger\\src\\main\\resources\\schema.sql"));

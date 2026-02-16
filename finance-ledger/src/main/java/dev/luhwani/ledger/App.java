@@ -2,7 +2,6 @@ package dev.luhwani.ledger;
 
 import java.util.Scanner;
 
-import dev.luhwani.ledger.repos.ConnectionManager;
 import dev.luhwani.ledger.utilities.CsvUtils;
 import dev.luhwani.ledger.utilities.LedgerUtils;
 
@@ -10,8 +9,6 @@ public class App {
 
     private static final Scanner scanner = new Scanner(System.in);
     public static void main(String[] args) throws Exception {
-        //ensure to delete after creating db
-        ConnectionManager.initDB();
         System.out.println("__Finance Ledger__");
         boolean usingSystem = true;
         while (usingSystem) {
