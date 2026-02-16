@@ -44,7 +44,7 @@ FinanceLedger
 │  │     │           │  └─ UserRepo.java  
 │  │     │           ├─ services/  
 │  │     │           │  ├─ SecurityService.java  
-│  │     │           │  ├─ UserServices.java  
+│  │     │           │  ├─ UserService.java  
 │  │     │           │  └─ Utils.java  
 │  │     │           ├─ utilities/  
 │  │     │           │  ├─ CsvUtils.java  

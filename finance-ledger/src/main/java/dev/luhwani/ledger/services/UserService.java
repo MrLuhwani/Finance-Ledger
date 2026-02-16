@@ -4,11 +4,11 @@ import dev.luhwani.ledger.customExceptions.DataAccessException;
 import dev.luhwani.ledger.customExceptions.UIException;
 import dev.luhwani.ledger.repos.UserRepo;
 
-public class UserServices {
+public class UserService {
 
     public UserRepo repo;
 
-    public UserServices(UserRepo repo) {
+    public UserService(UserRepo repo) {
         this.repo = repo;
     }
 
