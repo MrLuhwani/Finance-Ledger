@@ -1,6 +1,6 @@
 -- this is the schema for my postgresql tables
 
-CREATE TABLE IF NOT EXIST users(
+CREATE TABLE IF NOT EXISTS users(
     id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     email VARCHAR(50) UNIQUE NOT NULL,
     username VARCHAR(20) UNIQUE NOT NULL,
@@ -14,8 +14,8 @@ CREATE TABLE IF NOT EXISTS transactions(
     date DATE NOT NULL,
     koboAmt BIGINT NOT NULL,
     created_at TIMESTAMPTZ NOT NULL,
-    entry_type VARCHAR(10) NOT NULL CHECK (entry_type IN ("INCOME", "EXPENSE")),
-    category TEXT NOT NULL, 
+    entry_type VARCHAR(10) NOT NULL CHECK (entry_type IN ('INCOME', 'EXPENSE')),
+    category TEXT NOT NULL,
     description VARCHAR(255) NOT NULL,
-    user_id REFERENCES users(id)
+    user_id BIGINT REFERENCES users(id)
 );
