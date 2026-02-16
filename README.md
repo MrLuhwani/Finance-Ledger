@@ -40,6 +40,7 @@ FinanceLedger
 │  │     │           │  ├─ Transaction.java  
 │  │     │           │  └─ User.java  
 │  │     │           ├─ repos/  
+│  │     │           │  ├─ ConnectionManager.java  
 │  │     │           │  └─ UserRepo.java  
 │  │     │           ├─ services/  
 │  │     │           │  ├─ UserServices.java  
