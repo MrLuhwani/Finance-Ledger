@@ -43,6 +43,7 @@ FinanceLedger
 │  │     │           │  ├─ ConnectionManager.java  
 │  │     │           │  └─ UserRepo.java  
 │  │     │           ├─ services/  
+│  │     │           │  ├─ SecurityService.java  
 │  │     │           │  ├─ UserServices.java  
 │  │     │           │  └─ Utils.java  
 │  │     │           ├─ utilities/  
