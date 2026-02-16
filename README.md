@@ -33,6 +33,8 @@ FinanceLedger
 │  │     │  └─ dev/  
 │  │     │     └─ luhwani/  
 │  │     │        └─ ledger/  
+│  │     │           ├─ appContext/  
+│  │     │           │  └─ AppContext.java  
 │  │     │           ├─ customExceptions/  
 │  │     │           │  ├─ DataAccessException.java  
 │  │     │           │  └─ UIException.java  
