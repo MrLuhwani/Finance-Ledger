@@ -39,6 +39,7 @@ FinanceLedger
 │  │     │           │  ├─ DataAccessException.java  
 │  │     │           │  └─ UIException.java  
 │  │     │           ├─ models/  
+│  │     │           │  ├─ LoginData.java  
 │  │     │           │  ├─ Transaction.java  
 │  │     │           │  └─ User.java  
 │  │     │           ├─ repos/  
