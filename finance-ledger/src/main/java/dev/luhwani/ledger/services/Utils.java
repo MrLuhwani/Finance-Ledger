@@ -14,7 +14,7 @@ public class Utils {
     }
 
     public static boolean validUsername(String username) {
-        Pattern p = Pattern.compile("^[a-zA-Z0-9_-]{5,14}$");
+        Pattern p = Pattern.compile("^(?=.*[a-zA-Z])[a-zA-Z0-9_-]{5,14}$");
         return p.matcher(username).matches();
     }
 }
