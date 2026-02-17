@@ -19,6 +19,7 @@ import dev.luhwani.ledger.utilities.LedgerUtils;
 public class App {
 
     private static final Scanner scanner = new Scanner(System.in);
+
     public static void main(String[] args) throws Exception {
         UserRepo userRepo = new UserRepo();
         UserService userService = new UserService(userRepo);
@@ -174,7 +175,7 @@ public class App {
 
     }
 
-    public static void menu(User user, AppContext context) {
+    private static void menu(User user, AppContext context) {
         System.out.println("__Finance Ledger__");
         boolean usingSystem = true;
         while (usingSystem) {
@@ -206,7 +207,7 @@ public class App {
         }
     }
 
-    public static void changePassword(User user, AppContext context) {
+    private static void changePassword(User user, AppContext context) {
         Optional<byte[]> oldPasswordHash;
         Optional<String> salt;
         UserService userService = context.getUserService();
