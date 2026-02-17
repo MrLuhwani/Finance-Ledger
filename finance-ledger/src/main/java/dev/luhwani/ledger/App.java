@@ -36,13 +36,18 @@ public class App {
             String response = scanner.nextLine();
             switch (response) {
                 case "1" -> {
-                    // run the login method
+                    Optional<User> user = login(context);
+                    if (user.isPresent()) {
+                        System.out.println("Welcome " + user.get().getUsername());
+                        menu();
+                    }
                 }
                 case "2" -> {
                     Optional<User> newUser = createAcct(context);
                     if (newUser.isPresent()) {
                         User user = newUser.get();
                         System.out.println("Welcome " + user.getUsername());
+                        menu();
                     }
 
                 }
@@ -56,7 +61,7 @@ public class App {
         }
     }
 
-    public static Optional<User> createAcct(AppContext context) {
+    private static Optional<User> createAcct(AppContext context) {
         String email;
         while (true) {
             System.out.print("Enter your email: ");
@@ -121,6 +126,49 @@ public class App {
             System.err.println(e.getMessage());
             return Optional.empty();
         }
+    }
+
+    private static Optional<User> login(AppContext context) {
+        String email;
+        while (true) {
+            System.out.print("Enter email: ");
+            email = scanner.nextLine();
+            if (Utils.validEmail(email)) {
+                break;
+            }
+            System.out.println("Invalid email");
+        }
+        UserService userService = context.getUserService();
+        Optional<LoginData> loginData = Optional.empty();
+        try {
+            loginData = userService.emailFound(email);
+            if (!loginData.isPresent()) {
+                System.out.println("This email is not registered");
+                return Optional.empty();
+            }
+        } catch (UIException e) {
+            System.err.println(e.getMessage());
+            return Optional.empty();
+        }
+        byte[] passwordHash = loginData.get().passwordHash();
+        String salt = loginData.get().salt();
+        System.out.print("Enter password: ");
+        String password = scanner.nextLine();
+        String passwordAndSalt = password + salt;
+        SecurityService securityService = context.getSecurityService();
+        try {
+            byte[] inputHash = securityService.hashText(passwordAndSalt);
+            if (!securityService.passwordsMatch(passwordHash, inputHash)) {
+                System.out.println("Invalid password");
+                return Optional.empty();
+            }
+            Optional<User> user = userService.login(loginData.get());
+            return user;
+        } catch (UIException e) {
+            System.err.println(e.getMessage());
+            return Optional.empty();
+        }
+
     }
 
     public static void menu() {

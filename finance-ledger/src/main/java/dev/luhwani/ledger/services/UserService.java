@@ -28,9 +28,19 @@ public class UserService {
         try {
             Optional<Long> userId = repo.registerUser(loginData);
             if (userId.isPresent()) {
-                return Optional.of(new User(loginData.email(), userId.get(), loginData.username()));
+                return Optional.of(new User(userId.get(), loginData.email(), loginData.username()));
             }
             return Optional.empty();
+        } catch (DataAccessException e) {
+            throw new UIException(e.getMessage(), e);
+        }
+    }
+
+    public Optional<User> login(LoginData loginData) {
+        try {
+            repo.setLastLogin(loginData.id());
+            Optional<User> user = Optional.of(new User(loginData.id(), loginData.email(), loginData.username()));
+            return user;
         } catch (DataAccessException e) {
             throw new UIException(e.getMessage(), e);
         }

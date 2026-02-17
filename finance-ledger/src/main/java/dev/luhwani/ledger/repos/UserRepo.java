@@ -59,4 +59,15 @@ public class UserRepo {
             throw new DataAccessException(e.getMessage(), e);
         }
     }
+
+    public void setLastLogin(Long userId) {
+        String sql = "UPDATE users SET last_login = NOW() WHERE id = ?;";
+        try(Connection conn = ConnectionManager.getConnection();
+            PreparedStatement pstmt = conn.prepareStatement(sql);) {
+            pstmt.setLong(1, userId);
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            throw new DataAccessException(e.getMessage(), e);
+        }
+    }
 }

@@ -10,7 +10,7 @@ public class User {
     private String username;
     private List<Transaction> transactions = new ArrayList<>();
 
-    public User(String email, Long id, String username) {
+    public User(Long id, String email, String username) {
         this.email = email;
         this.id = id;
         this.username = username;
