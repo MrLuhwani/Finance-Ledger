@@ -45,8 +45,10 @@ FinanceLedger
 │  │     │           │  └─ User.java  
 │  │     │           ├─ repos/  
 │  │     │           │  ├─ ConnectionManager.java  
+│  │     │           │  ├─ LedgerRepo.java  
 │  │     │           │  └─ UserRepo.java  
 │  │     │           ├─ services/  
+│  │     │           │  ├─ LedgerService.java  
 │  │     │           │  ├─ SecurityService.java  
 │  │     │           │  ├─ UserService.java  
 │  │     │           │  └─ Utils.java  

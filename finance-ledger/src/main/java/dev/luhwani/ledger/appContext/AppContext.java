@@ -1,15 +1,18 @@
 package dev.luhwani.ledger.appContext;
 
+import dev.luhwani.ledger.services.LedgerService;
 import dev.luhwani.ledger.services.SecurityService;
 import dev.luhwani.ledger.services.UserService;
 
 public class AppContext {
-    public SecurityService securityService;
-    public UserService userService;
+    private final SecurityService securityService;
+    private final UserService userService;
+    private final LedgerService ledgerService;
 
-    public AppContext(SecurityService securityService, UserService userService) {
+    public AppContext(SecurityService securityService, UserService userService, LedgerService ledgerService) {
         this.securityService = securityService;
         this.userService = userService;
+        this.ledgerService = ledgerService;
     }
 
     public SecurityService getSecurityService() {
@@ -18,5 +21,9 @@ public class AppContext {
 
     public UserService getUserService() {
         return userService;
+    }
+
+    public LedgerService getLedgerService() {
+        return ledgerService;
     }
 }

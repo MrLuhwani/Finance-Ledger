@@ -7,7 +7,9 @@ import dev.luhwani.ledger.appContext.AppContext;
 import dev.luhwani.ledger.customExceptions.UIException;
 import dev.luhwani.ledger.models.LoginData;
 import dev.luhwani.ledger.models.User;
+import dev.luhwani.ledger.repos.LedgerRepo;
 import dev.luhwani.ledger.repos.UserRepo;
+import dev.luhwani.ledger.services.LedgerService;
 import dev.luhwani.ledger.services.SecurityService;
 import dev.luhwani.ledger.services.UserService;
 import dev.luhwani.ledger.services.Utils;
@@ -21,7 +23,9 @@ public class App {
         UserRepo userRepo = new UserRepo();
         UserService userService = new UserService(userRepo);
         SecurityService securityService = new SecurityService();
-        AppContext context = new AppContext(securityService, userService);
+        LedgerRepo ledgerRepo = new LedgerRepo();
+        LedgerService ledgerService = new LedgerService(ledgerRepo);
+        AppContext context = new AppContext(securityService, userService, ledgerService);
         startApp(context);
     }
 
