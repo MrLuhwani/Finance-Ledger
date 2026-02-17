@@ -28,7 +28,7 @@ public class UserRepo {
                     return Optional.of(new LoginData(id, emailResult, usernameResult, passwordHash, salt));
                 }
                 return Optional.empty();
-            } 
+            }
         } catch (SQLException e) {
             throw new DataAccessException(e.getMessage(), e);
         }
@@ -62,9 +62,57 @@ public class UserRepo {
 
     public void setLastLogin(Long userId) {
         String sql = "UPDATE users SET last_login = NOW() WHERE id = ?;";
-        try(Connection conn = ConnectionManager.getConnection();
-            PreparedStatement pstmt = conn.prepareStatement(sql);) {
+        try (Connection conn = ConnectionManager.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(sql);) {
             pstmt.setLong(1, userId);
+            pstmt.executeUpdate();
+        } catch (SQLException e) {
+            throw new DataAccessException(e.getMessage(), e);
+        }
+    }
+
+    public Optional<byte[]> getPassword(Long userId) {
+        byte[] passwordHash;
+        String sql = "SELECT password_hash FROM users WHERE id = ?";
+        try (Connection conn = ConnectionManager.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setLong(1, userId);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    passwordHash = rs.getBytes("password_hash");
+                    return Optional.of(passwordHash);
+                }
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException(e.getMessage(), e);
+        }
+        return Optional.empty();
+    }
+
+    public Optional<String> getSalt(Long userId) {
+        String salt;
+        String sql = "SELECT password_salt FROM users WHERE id = ?";
+        try (Connection conn = ConnectionManager.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setLong(1, userId);
+            try (ResultSet rs = pstmt.executeQuery()) {
+                if (rs.next()) {
+                    salt = rs.getString("password_salt");
+                    return Optional.ofNullable(salt);
+                }
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException(e.getMessage(), e);
+        }
+        return Optional.empty();
+    }
+
+    public void updatePassword(Long userId, byte[] passwordHash, String salt) {
+        String sql = "UPDATE users SET password_hash = ?, password_salt = ? WHERE id = ?";
+        try (Connection conn = ConnectionManager.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            pstmt.setBytes(1, passwordHash);
+            pstmt.setString(2, salt);
+            pstmt.setLong(3, userId);
             pstmt.executeUpdate();
         } catch (SQLException e) {
             throw new DataAccessException(e.getMessage(), e);

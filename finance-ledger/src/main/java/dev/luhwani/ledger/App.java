@@ -33,21 +33,20 @@ public class App {
                     2.Create Account
                     3.Exit""");
             System.out.print("Response: ");
-            String response = scanner.nextLine();
+            String response = scanner.nextLine().trim();
             switch (response) {
                 case "1" -> {
                     Optional<User> user = login(context);
                     if (user.isPresent()) {
                         System.out.println("Welcome " + user.get().getUsername());
-                        menu();
+                        menu(user.get(), context);
                     }
                 }
                 case "2" -> {
                     Optional<User> newUser = createAcct(context);
                     if (newUser.isPresent()) {
-                        User user = newUser.get();
-                        System.out.println("Welcome " + user.getUsername());
-                        menu();
+                        System.out.println("Welcome " + newUser.get().getUsername());
+                        menu(newUser.get(), context);
                     }
 
                 }
@@ -171,7 +170,7 @@ public class App {
 
     }
 
-    public static void menu() {
+    public static void menu(User user, AppContext context) {
         System.out.println("__Finance Ledger__");
         boolean usingSystem = true;
         while (usingSystem) {
@@ -183,21 +182,71 @@ public class App {
                     3.Edit transaction
                     4.Delete transaction
                     5.Show monthly summary
+                    6.Change Password
                     0.Exit
                     Response: """);
-            response = scanner.next();
+            response = scanner.nextLine().trim();
             switch (response) {
                 case "1" -> CsvUtils.getCSV();
                 case "2" -> LedgerUtils.addTransaction();
                 case "3" -> LedgerUtils.editTransaction();
                 case "4" -> LedgerUtils.deleteTransaction();
                 case "5" -> LedgerUtils.monthlySummary();
+                case "6" -> changePassword(user, context);
                 case "0" -> {
                     usingSystem = false;
                     System.out.println("Exiting program...");
                 }
                 default -> System.out.println("Invalid input");
             }
+        }
+    }
+
+    public static void changePassword(User user, AppContext context) {
+        Optional<byte[]> oldPasswordHash;
+        Optional<String> salt;
+        UserService userService = context.getUserService();
+        SecurityService securityService = context.getSecurityService();
+        try {
+            oldPasswordHash = userService.getPassword(user.getId());
+            salt = userService.getSalt(user.getId());
+            while (true) {
+                System.out.print("Enter old password: ");
+                String oldPassword = scanner.nextLine();
+                String oldPasswordAndSalt = oldPassword + salt.get();
+                byte[] oldPasswordHashInput = securityService.hashText(oldPasswordAndSalt);
+                if (securityService.passwordsMatch(oldPasswordHash.get(), oldPasswordHashInput)) {
+                    break;
+                }
+                System.out.println("Invalid password");
+            }
+        } catch (UIException e) {
+            System.err.println(e.getMessage());
+        }
+        String newPassword;
+        System.out.println("""
+                Set new Password:
+                Password requirements:
+                1.Between 7 - 20 characters long
+                2.No space
+                3.Contains both letters and numbers
+                4.Contains at least one symbol""");
+        while (true) {
+            System.out.print("Response: ");
+            newPassword = scanner.nextLine();
+            if (Utils.validPassword(newPassword)) {
+                break;
+            }
+            System.out.println("Invalid Password");
+        }
+        String newSalt = securityService.saltGenerator();
+        String newPasswordAndSalt = newPassword + newSalt;
+        try {
+            byte[] newPasswordHash = securityService.hashText(newPasswordAndSalt);
+            userService.updatePassword(user.getId(), newPasswordHash, newSalt);
+            System.out.println("Password updated successfully");
+        } catch (UIException e) {
+            System.err.println(e.getMessage());
         }
     }
 }

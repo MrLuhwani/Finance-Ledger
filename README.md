@@ -6,6 +6,7 @@ The ledger can also be exported in a csv
 ---
 
 ## Current Features  
+- User Account creation methods
 - Add new transactions  
 - Edit existing transactions  
 - Delete transactions  
@@ -13,13 +14,13 @@ The ledger can also be exported in a csv
 - Auto-sorted by date (newest dates are on top)  
 - Monthly income/expense summary  
 - CSV persistence using a static initializer block  
+- Persistence with DB
 
 ---
 
 ## Planned Features  
 - Supporting multiple users
 - Filter by different criteria
-- Persistence with DB
 - Export to csv
 
 ---

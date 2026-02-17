@@ -10,7 +10,7 @@ import dev.luhwani.ledger.repos.UserRepo;
 
 public class UserService {
 
-    public UserRepo repo;
+    private UserRepo repo;
 
     public UserService(UserRepo repo) {
         this.repo = repo;
@@ -41,6 +41,30 @@ public class UserService {
             repo.setLastLogin(loginData.id());
             Optional<User> user = Optional.of(new User(loginData.id(), loginData.email(), loginData.username()));
             return user;
+        } catch (DataAccessException e) {
+            throw new UIException(e.getMessage(), e);
+        }
+    }
+
+    public Optional<byte[]> getPassword(long userId) {
+        try {
+            return repo.getPassword(userId);
+        } catch (DataAccessException e) {
+            throw new UIException(e.getMessage(), e);
+        }
+    }
+
+    public Optional<String> getSalt(long userId) {
+        try {
+            return repo.getSalt(userId);
+        } catch (DataAccessException e) {
+            throw new UIException(e.getMessage(), e);
+        }
+    }
+
+    public void updatePassword(Long userId, byte[] passwordHash, String salt) {
+        try {
+            repo.updatePassword(userId, passwordHash, salt);
         } catch (DataAccessException e) {
             throw new UIException(e.getMessage(), e);
         }
