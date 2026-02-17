@@ -12,20 +12,23 @@ import dev.luhwani.ledger.models.LoginData;
 
 public class UserRepo {
 
-    public boolean findEmail(String email) {
-        String sql = "SELECT email FROM users;";
+    public Optional<LoginData> findEmail(String email) {
+        String sql = "SELECT id, email, username, password_hash, password_salt FROM users WHERE email = ?;";
         try (
                 Connection conn = ConnectionManager.getConnection();
-                Statement stmt = conn.createStatement();
-                ResultSet rs = stmt.executeQuery(sql);) {
-            String result;
-            while (rs.next()) {
-                result = rs.getString("email");
-                if (result.equals(email)) {
-                    return true;
+                PreparedStatement pstmt = conn.prepareStatement(sql);) {
+            pstmt.setString(1, email);
+            try (ResultSet rs = pstmt.executeQuery();) {
+                if (rs.next()) {
+                    Long id = rs.getLong("id");
+                    String emailResult = rs.getString("email");
+                    String usernameResult = rs.getString("username");
+                    byte[] passwordHash = rs.getBytes("password_hash");
+                    String salt = rs.getString("password_salt");
+                    return Optional.of(new LoginData(id, emailResult, usernameResult, passwordHash, salt));
                 }
-            }
-            return false;
+                return Optional.empty();
+            } 
         } catch (SQLException e) {
             throw new DataAccessException(e.getMessage(), e);
         }

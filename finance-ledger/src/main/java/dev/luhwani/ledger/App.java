@@ -67,10 +67,9 @@ public class App {
             System.out.println("Invalid email");
         }
         UserService userService = context.getUserService();
-        boolean userExists;
         try {
-            userExists = userService.emailFound(email);
-            if (userExists) {
+            Optional<LoginData> userExists = userService.emailFound(email);
+            if (userExists.isPresent()) {
                 System.out.println("This email is already in use");
                 return Optional.empty();
             }

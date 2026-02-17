@@ -16,7 +16,7 @@ public class UserService {
         this.repo = repo;
     }
 
-    public boolean emailFound(String email) {
+    public Optional<LoginData> emailFound(String email) {
         try {
             return repo.findEmail(email);
         } catch (DataAccessException e) {
