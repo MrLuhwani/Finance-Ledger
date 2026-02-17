@@ -6,7 +6,8 @@ CREATE TABLE IF NOT EXISTS users(
     username VARCHAR(20) UNIQUE NOT NULL,
     password_hash BYTEA NOT NULL,
     password_salt VARCHAR(10) NOT NULL,
-    created_at TIMESTAMPTZ DEFAULT NOW()
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    last_login TIMESTAMPTZ
 );
 
 CREATE TABLE IF NOT EXISTS transactions(

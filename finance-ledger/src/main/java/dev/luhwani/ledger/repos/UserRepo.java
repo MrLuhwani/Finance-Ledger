@@ -35,7 +35,7 @@ public class UserRepo {
     }
 
     public Optional<Long> registerUser(LoginData loginData) {
-        String sql = "INSERT INTO users (email, password_salt, username, password_hash) VALUES (?, ?, ?, ?);";
+        String sql = "INSERT INTO users (email, password_salt, username, password_hash, last_login) VALUES (?, ?, ?, ?, NOW());";
         String email = loginData.email();
         String salt = loginData.salt();
         String username = loginData.username();
