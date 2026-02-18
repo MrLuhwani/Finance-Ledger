@@ -1,10 +1,18 @@
 package dev.luhwani.ledger;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.EnumSet;
 import java.util.Optional;
 import java.util.Scanner;
 
 import dev.luhwani.ledger.appContext.AppContext;
 import dev.luhwani.ledger.customExceptions.UIException;
+import dev.luhwani.ledger.models.Category;
+import dev.luhwani.ledger.models.EntryType;
 import dev.luhwani.ledger.models.LoginData;
 import dev.luhwani.ledger.models.User;
 import dev.luhwani.ledger.repos.LedgerRepo;
@@ -205,6 +213,78 @@ public class App {
                 default -> System.out.println("Invalid input");
             }
         }
+    }
+
+    private static void getTransactionDetails(User user, AppContext context) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        LocalDate date;
+        while (true) {
+            try {
+                LocalDate todayDate = LocalDate.now();
+                System.out.print("Enter the date of the transaction (yyyy-MM-dd): ");
+                String input = scanner.nextLine().trim();
+                date = LocalDate.parse(input, formatter);
+                if (!date.isAfter(todayDate)) {
+                    break;
+                }
+                System.out.println("Invalid date. Cannot input future dates!");
+            } catch (DateTimeParseException e) {
+                System.out.println("Invalid date format!");
+            }
+        }
+        EntryType entryType;
+        System.out.println("Modify the fields as needed: ");
+        while (true) {
+            System.out.print("Enter the type of transaction(Income|Expense): ");
+            String type = scanner.nextLine().toLowerCase();
+            if (type.equals("income")) {
+                entryType = EntryType.INCOME;
+                break;
+            } else if (type.equals("expense")) {
+                entryType = EntryType.EXPENSE;
+                break;
+            } else {
+                System.out.println("Invalid input!");
+            }
+        }
+        Long koboAmt;
+        while (true) {
+            System.out.print("Enter the amount for your transaction: ");
+            String amtString = scanner.nextLine().trim();
+            try{
+                BigDecimal nairaAmt = new BigDecimal(amtString).setScale(2, RoundingMode.HALF_UP);
+                if (nairaAmt.scale() > 2) {
+                   System.out.println("Amount must be in two decimal places"); 
+                } else if (nairaAmt.compareTo(BigDecimal.ZERO) < 0) {
+                    System.out.println("Amount can't be less than zero");
+                } else {
+                    koboAmt = nairaAmt.multiply(BigDecimal.valueOf(100)).longValueExact();
+                    break;
+                }
+            } catch (NumberFormatException | ArithmeticException e) {
+                System.out.println("Invalid input!");
+            }
+        }
+        EnumSet<Category> categories = context.getLedgerService().getCategories();
+        int count = 0;
+        System.out.println("__Categories__");
+        for (Category category : categories) {
+            count++;
+            System.out.println(count + "." + category);
+        }
+        //something urgent came up... To be continued
+
+        
+        // String categoryChoice;
+        // while (true) {
+        //     System.out.print("Enter a category for your transaction: ");
+        //     categoryChoice = scanner.nextLine().trim().toUpperCase();
+        //     if (categoryChoice.isEmpty()) {
+        //         System.out.println("Please enter a category for your transaction! ");
+        //     } else if(){
+        //         break;
+        //     }
+        // }
     }
 
     private static void changePassword(User user, AppContext context) {
