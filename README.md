@@ -51,7 +51,7 @@ FinanceLedger
 │  │     │           │  ├─ LedgerRepo.java  
 │  │     │           │  └─ UserRepo.java  
 │  │     │           ├─ services/  
-│  │     │           │  ├─ LedgerService.java  
+│  │     │           │  ├─ TransactionService.java  
 │  │     │           │  ├─ SecurityService.java  
 │  │     │           │  ├─ UserService.java  
 │  │     │           │  └─ Utils.java  

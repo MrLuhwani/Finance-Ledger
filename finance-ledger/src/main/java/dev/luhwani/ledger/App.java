@@ -20,7 +20,7 @@ import dev.luhwani.ledger.models.Transaction2;
 import dev.luhwani.ledger.models.User;
 import dev.luhwani.ledger.repos.LedgerRepo;
 import dev.luhwani.ledger.repos.UserRepo;
-import dev.luhwani.ledger.services.LedgerService;
+import dev.luhwani.ledger.services.TransactionService;
 import dev.luhwani.ledger.services.SecurityService;
 import dev.luhwani.ledger.services.UserService;
 import dev.luhwani.ledger.services.Utils;
@@ -36,8 +36,8 @@ public class App {
         UserService userService = new UserService(userRepo);
         SecurityService securityService = new SecurityService();
         LedgerRepo ledgerRepo = new LedgerRepo();
-        LedgerService ledgerService = new LedgerService(ledgerRepo);
-        AppContext context = new AppContext(securityService, userService, ledgerService);
+        TransactionService transactionService = new TransactionService(ledgerRepo);
+        AppContext context = new AppContext(securityService, userService, transactionService);
         startApp(context);
     }
 
@@ -218,7 +218,13 @@ public class App {
         }
     }
 
-    private static Transaction2 getTransactionDetails(User user, LedgerService ledgerService) {
+    private static void addTransaction(AppContext context, User user) {
+        Transaction2 transaction2 = getTransactionDetails(user, context.getTransactionService());
+        
+        //add it to the users arrayList of transactions
+    }
+
+    private static Transaction2 getTransactionDetails(User user, TransactionService transactionService) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         LocalDate date;
         while (true) {
@@ -269,7 +275,7 @@ public class App {
             }
         }
         Category category;
-        EnumSet<Category> categorySet = ledgerService.getCategories();
+        EnumSet<Category> categorySet = transactionService.getCategories();
         int count = 0;
         System.out.println("__Categories__");
         for (Category c : categorySet) {
