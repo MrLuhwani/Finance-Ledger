@@ -196,7 +196,7 @@ public class LedgerUtils {
             while (true) {
                 System.out.print("Enter a short description for your transaction: ");
                 description = scanner.nextLine();
-                if (description.trim().isEmpty()) {
+                if (description.trim().isEmpty() ) {
                     System.out.println("Please enter a short description for your transaction! ");
                 } else {
                     break;

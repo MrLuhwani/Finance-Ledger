@@ -5,7 +5,9 @@ import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.ArrayList;
 import java.util.EnumSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
 
@@ -14,6 +16,7 @@ import dev.luhwani.ledger.customExceptions.UIException;
 import dev.luhwani.ledger.models.Category;
 import dev.luhwani.ledger.models.EntryType;
 import dev.luhwani.ledger.models.LoginData;
+import dev.luhwani.ledger.models.Transaction2;
 import dev.luhwani.ledger.models.User;
 import dev.luhwani.ledger.repos.LedgerRepo;
 import dev.luhwani.ledger.repos.UserRepo;
@@ -215,11 +218,7 @@ public class App {
         }
     }
 
-    private static void addTransaction(AppContext context, User user) {
-        
-    }
-
-    private static void getTransactionDetails(User user, AppContext context) {
+    private static Transaction2 getTransactionDetails(User user, LedgerService ledgerService) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         LocalDate date;
         while (true) {
@@ -233,7 +232,7 @@ public class App {
                 }
                 System.out.println("Invalid date. Cannot input future dates!");
             } catch (DateTimeParseException e) {
-                System.out.println("Invalid date format!");
+                System.err.println("Invalid date format!");
             }
         }
         EntryType entryType;
@@ -266,27 +265,50 @@ public class App {
                     break;
                 }
             } catch (NumberFormatException | ArithmeticException e) {
-                System.out.println("Invalid input!");
+                System.err.println("Invalid input!");
             }
         }
-        EnumSet<Category> categories = context.getLedgerService().getCategories();
+        Category category;
+        EnumSet<Category> categorySet = ledgerService.getCategories();
         int count = 0;
         System.out.println("__Categories__");
-        for (Category category : categories) {
+        for (Category c : categorySet) {
             count++;
-            System.out.println(count + "." + category);
+            System.out.println(count + "." + c);
         }
-        String categoryChoice;
         while (true) {
-            System.out.print("Enter a category for your transaction: ");
-            categoryChoice = scanner.nextLine().trim().toUpperCase();
+            String categoryChoice;
+            System.out.print("Enter the number for the category for your transaction: ");
+            categoryChoice = scanner.nextLine().trim();
             if (categoryChoice.isEmpty()) {
-                System.out.println("Please enter a category for your transaction! ");
-            } 
-            // else if(){
-            //     break;
-            // }
+                System.out.println("Please enter a valid category for your transaction! ");
+                continue;
+            }
+            List<Category> categoryList = new ArrayList<>(categorySet);
+            int choiceInt;
+            try {
+                choiceInt = Utils.validIntChoice(categoryChoice, categoryList.size());
+                category = categoryList.get(choiceInt - 1);
+                break;
+            } catch (NumberFormatException | IndexOutOfBoundsException e) {
+               System.err.println("Invalid input");
+            }
         }
+        String description;
+        //hopefully the frontend can implement a way to show the num of chars
+        //as the user is typing
+        while (true) {
+            System.out.print("Enter a short description for your transaction (not more than 50 chars): ");
+            description = scanner.nextLine().trim();
+            if (description.isEmpty()) {
+                System.out.println("Please enter a short description for your transaction! ");
+            } else if (description.length() >= 50){
+                System.out.println("Description has exceeded character limit");
+            } else {
+                break;
+            }
+        }
+        return new Transaction2(0L, date, koboAmt, entryType, category, description, user.getId());
     }
 
     private static void changePassword(User user, AppContext context) {

@@ -17,4 +17,13 @@ public class Utils {
         Pattern p = Pattern.compile("^(?=.*[a-zA-Z])[a-zA-Z0-9_-]{5,14}$");
         return p.matcher(username).matches();
     }
+
+    public static int validIntChoice(String choice, int range) {
+        int choiceInt = Integer.parseInt(choice);
+        if (choiceInt > 0 || choiceInt <= range) {
+            return choiceInt;
+        } else {
+            throw new IndexOutOfBoundsException();
+        }
+    }
 }
