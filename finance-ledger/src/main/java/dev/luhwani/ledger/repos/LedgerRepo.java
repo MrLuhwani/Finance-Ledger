@@ -6,5 +6,9 @@ import dev.luhwani.ledger.models.Category;
 
 public class LedgerRepo {
     
-    public EnumSet<Category> allCategories = EnumSet.allOf(Category.class);
+    private EnumSet<Category> allCategories = EnumSet.allOf(Category.class);
+
+    public EnumSet<Category> allCategories(){
+        return allCategories;
+    }
 }

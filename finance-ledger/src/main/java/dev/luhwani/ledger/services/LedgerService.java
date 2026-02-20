@@ -14,6 +14,6 @@ public class LedgerService {
     }
 
     public EnumSet<Category> getCategories() {
-        return repo.allCategories;
+        return repo.allCategories();
     }
 }

@@ -215,6 +215,10 @@ public class App {
         }
     }
 
+    private static void addTransaction(AppContext context, User user) {
+        
+    }
+
     private static void getTransactionDetails(User user, AppContext context) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         LocalDate date;
@@ -272,19 +276,17 @@ public class App {
             count++;
             System.out.println(count + "." + category);
         }
-        //something urgent came up... To be continued
-
-        
-        // String categoryChoice;
-        // while (true) {
-        //     System.out.print("Enter a category for your transaction: ");
-        //     categoryChoice = scanner.nextLine().trim().toUpperCase();
-        //     if (categoryChoice.isEmpty()) {
-        //         System.out.println("Please enter a category for your transaction! ");
-        //     } else if(){
-        //         break;
-        //     }
-        // }
+        String categoryChoice;
+        while (true) {
+            System.out.print("Enter a category for your transaction: ");
+            categoryChoice = scanner.nextLine().trim().toUpperCase();
+            if (categoryChoice.isEmpty()) {
+                System.out.println("Please enter a category for your transaction! ");
+            } 
+            // else if(){
+            //     break;
+            // }
+        }
     }
 
     private static void changePassword(User user, AppContext context) {
