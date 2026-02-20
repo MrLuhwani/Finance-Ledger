@@ -3,13 +3,13 @@ package dev.luhwani.ledger.services;
 import java.util.EnumSet;
 
 import dev.luhwani.ledger.models.Category;
-import dev.luhwani.ledger.repos.LedgerRepo;
+import dev.luhwani.ledger.repos.TransactionRepo;
 
 public class TransactionService {
     
-    private final LedgerRepo repo;
+    private final TransactionRepo repo;
     
-    public TransactionService(LedgerRepo repo) {
+    public TransactionService(TransactionRepo repo) {
         this.repo = repo;
     }
 

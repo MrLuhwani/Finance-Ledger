@@ -18,7 +18,7 @@ import dev.luhwani.ledger.models.EntryType;
 import dev.luhwani.ledger.models.LoginData;
 import dev.luhwani.ledger.models.Transaction2;
 import dev.luhwani.ledger.models.User;
-import dev.luhwani.ledger.repos.LedgerRepo;
+import dev.luhwani.ledger.repos.TransactionRepo;
 import dev.luhwani.ledger.repos.UserRepo;
 import dev.luhwani.ledger.services.TransactionService;
 import dev.luhwani.ledger.services.SecurityService;
@@ -35,8 +35,8 @@ public class App {
         UserRepo userRepo = new UserRepo();
         UserService userService = new UserService(userRepo);
         SecurityService securityService = new SecurityService();
-        LedgerRepo ledgerRepo = new LedgerRepo();
-        TransactionService transactionService = new TransactionService(ledgerRepo);
+        TransactionRepo transactionRepo = new TransactionRepo();
+        TransactionService transactionService = new TransactionService(transactionRepo);
         AppContext context = new AppContext(securityService, userService, transactionService);
         startApp(context);
     }
