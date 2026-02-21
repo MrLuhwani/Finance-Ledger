@@ -13,10 +13,13 @@ CREATE TABLE IF NOT EXISTS users(
 CREATE TABLE IF NOT EXISTS transactions(
     id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
     date DATE NOT NULL,
+    --check pgAdmin if its koboAmt or kobo_amt
     koboAmt BIGINT NOT NULL,
-    created_at TIMESTAMPTZ NOT NULL,
+    --change in pgAdmin
+    created_at TIMESTAMPTZ DEFAULT NOW(),
     entry_type VARCHAR(10) NOT NULL CHECK (entry_type IN ('INCOME', 'EXPENSE')),
     category TEXT NOT NULL,
+    --change schema in pgAdmin later
     description VARCHAR(50) NOT NULL,
     user_id BIGINT REFERENCES users(id)
 );
