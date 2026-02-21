@@ -1,10 +1,12 @@
 package dev.luhwani.ledger.services;
 
+import java.util.List;
 import java.util.Optional;
 
 import dev.luhwani.ledger.customExceptions.DataAccessException;
 import dev.luhwani.ledger.customExceptions.UIException;
 import dev.luhwani.ledger.models.LoginData;
+import dev.luhwani.ledger.models.Transaction2;
 import dev.luhwani.ledger.models.User;
 import dev.luhwani.ledger.repos.UserRepo;
 
@@ -38,8 +40,12 @@ public class UserService {
 
     public Optional<User> login(LoginData loginData) {
         try {
+            List<Transaction2> transactionList = repo.getUserTransactions(loginData.id());
             repo.setLastLogin(loginData.id());
             Optional<User> user = Optional.of(new User(loginData.id(), loginData.email(), loginData.username()));
+            if (!transactionList.isEmpty()) {
+                user.get().setTransactionList(transactionList);
+            }
             return user;
         } catch (DataAccessException e) {
             throw new UIException(e.getMessage(), e);

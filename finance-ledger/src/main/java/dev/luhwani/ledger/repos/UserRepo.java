@@ -5,10 +5,16 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import dev.luhwani.ledger.customExceptions.DataAccessException;
+import dev.luhwani.ledger.models.Category;
+import dev.luhwani.ledger.models.EntryType;
 import dev.luhwani.ledger.models.LoginData;
+import dev.luhwani.ledger.models.Transaction2;
 
 public class UserRepo {
 
@@ -55,6 +61,30 @@ public class UserRepo {
                 }
             }
             return Optional.empty();
+        } catch (SQLException e) {
+            throw new DataAccessException(e.getMessage(), e);
+        }
+    }
+
+    public List<Transaction2> getUserTransactions(Long userId) {
+        String sql = "SELECT date, kobo_amt, entry_type, category, description, user_id FROM transactions WHERE user_id = ?;";
+        try (
+            Connection conn = ConnectionManager.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql);
+        ) {
+            pstmt.setLong(1, userId);
+            List<Transaction2> trs = new ArrayList<>();
+            try (ResultSet rs = pstmt.executeQuery()) {
+                while (rs.next()) {
+                    LocalDate date = (LocalDate) rs.getObject("date");
+                    Long koboAmt = rs.getLong("kobo_amt");
+                    EntryType entryType = EntryType.valueOf(rs.getString("entry_type"));
+                    Category category= Category.valueOf(rs.getString("category"));
+                    String description = rs.getString("description");
+                    Transaction2 tr = new Transaction2(date, koboAmt, entryType, category, description, userId);
+                    trs.add(tr);
+                }
+            }
+            return trs;
         } catch (SQLException e) {
             throw new DataAccessException(e.getMessage(), e);
         }

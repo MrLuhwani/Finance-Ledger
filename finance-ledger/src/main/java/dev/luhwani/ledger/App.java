@@ -204,7 +204,7 @@ public class App {
             response = scanner.nextLine().trim();
             switch (response) {
                 case "1" -> CsvUtils.getCSV();
-                case "2" -> LedgerUtils.addTransaction();
+                case "2" -> addTransaction(context.getTransactionService(), user);
                 case "3" -> LedgerUtils.editTransaction();
                 case "4" -> LedgerUtils.deleteTransaction();
                 case "5" -> LedgerUtils.monthlySummary();
@@ -218,10 +218,13 @@ public class App {
         }
     }
 
-    private static void addTransaction(AppContext context, User user) {
-        Transaction2 transaction2 = getTransactionDetails(user, context.getTransactionService());
-        
-        //add it to the users arrayList of transactions
+    private static void addTransaction(TransactionService transactionService, User user) {
+        Transaction2 transaction2 = getTransactionDetails(user, transactionService);
+        try {
+            transactionService.addTransaction(user, transaction2);
+        } catch (UIException e) {
+            System.err.println(e.getMessage());
+        }
     }
 
     private static Transaction2 getTransactionDetails(User user, TransactionService transactionService) {
@@ -314,7 +317,7 @@ public class App {
                 break;
             }
         }
-        return new Transaction2(0L, date, koboAmt, entryType, category, description, user.getId());
+        return new Transaction2(date, koboAmt, entryType, category, description, user.getId());
     }
 
     private static void changePassword(User user, AppContext context) {
