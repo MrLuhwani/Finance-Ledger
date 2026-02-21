@@ -205,7 +205,7 @@ public class App {
             switch (response) {
                 case "1" -> CsvUtils.getCSV();
                 case "2" -> addTransaction(context.getTransactionService(), user);
-                case "3" -> LedgerUtils.editTransaction();
+                case "3" -> editTransaction(context.getTransactionService(), user);
                 case "4" -> LedgerUtils.deleteTransaction();
                 case "5" -> LedgerUtils.monthlySummary();
                 case "6" -> changePassword(user, context);
@@ -219,15 +219,46 @@ public class App {
     }
 
     private static void addTransaction(TransactionService transactionService, User user) {
-        Transaction2 transaction2 = getTransactionDetails(user, transactionService);
+        Transaction2 transaction2 = getTransactionDetails(user, transactionService, Optional.empty());
         try {
             transactionService.addTransaction(user, transaction2);
+        } catch (UIException | NullPointerException e) {
+            System.err.println(e.getMessage());
+        }
+    }
+
+    private static void editTransaction(TransactionService transactionService, User user) {
+        List<Transaction2> transactions = user.getTransactions();
+        System.out.println("id, Date, Amount, Category, Description");
+        int count = 1;
+        for (Transaction2 tr : transactions) {
+            System.out.println(count + ", " + tr.toString());
+        }
+        int choiceInt;
+        Transaction2 t2;
+        while (true) {
+            System.out.print("Enter the id for the transaction you wish to change: ");
+            String choice = scanner.nextLine().trim();
+            try {
+                choiceInt = Utils.validIntChoice(choice, transactions.size());
+                t2 = transactions.get(choiceInt - 1);
+                break;
+            } catch (NumberFormatException | IndexOutOfBoundsException e) {
+               System.err.println("Invalid input");
+            }
+        }
+        System.out.println("Edit the required fields: ");
+        Transaction2 tr = getTransactionDetails(user, transactionService, Optional.of(t2.id()));
+        try {
+            transactionService.editTransaction(user, tr);
+            transactions.remove(choiceInt - 1);
+            transactions.add(tr);
         } catch (UIException e) {
             System.err.println(e.getMessage());
         }
     }
 
-    private static Transaction2 getTransactionDetails(User user, TransactionService transactionService) {
+    private static Transaction2 getTransactionDetails(User user, TransactionService transactionService, Optional<Long> transactionId) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         LocalDate date;
         while (true) {
@@ -267,8 +298,8 @@ public class App {
                 BigDecimal nairaAmt = new BigDecimal(amtString).setScale(2, RoundingMode.HALF_UP);
                 if (nairaAmt.scale() > 2) {
                    System.out.println("Amount must be in two decimal places"); 
-                } else if (nairaAmt.compareTo(BigDecimal.ZERO) < 0) {
-                    System.out.println("Amount can't be less than zero");
+                } else if (nairaAmt.compareTo(BigDecimal.ZERO) <= 0) {
+                    System.out.println("Amount can't be less than or equal to zero");
                 } else {
                     koboAmt = nairaAmt.multiply(BigDecimal.valueOf(100)).longValueExact();
                     break;
@@ -317,7 +348,10 @@ public class App {
                 break;
             }
         }
-        return new Transaction2(date, koboAmt, entryType, category, description, user.getId());
+        if (transactionId.isPresent()) {
+            return new Transaction2(transactionId.get(), date, koboAmt, entryType, category, description, user.getId());
+        }
+        return new Transaction2(0L, date, koboAmt, entryType, category, description, user.getId());
     }
 
     private static void changePassword(User user, AppContext context) {

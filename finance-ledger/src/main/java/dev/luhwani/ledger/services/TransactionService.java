@@ -1,6 +1,7 @@
 package dev.luhwani.ledger.services;
 
 import java.util.EnumSet;
+import java.util.Optional;
 
 import dev.luhwani.ledger.customExceptions.DataAccessException;
 import dev.luhwani.ledger.customExceptions.UIException;
@@ -23,8 +24,20 @@ public class TransactionService {
 
     public void addTransaction(User user,Transaction2 transaction2) {
         try {
-            repo.storeTransaction(transaction2);
-            user.addTransaction(transaction2);
+            Optional<Transaction2> tr =  repo.returnStoredTransaction(transaction2);
+            if (tr.isPresent()) {
+                user.addTransaction(tr.get());
+                return;
+            }
+            throw new NullPointerException("ID couldn't be retrieved while storing transaction");
+        } catch (DataAccessException e) {
+            throw new UIException(e.getMessage(), e);
+        }
+    }
+
+    public void editTransaction(User user,Transaction2 transaction2) {
+        try {
+            repo.editTransaction(transaction2);
         } catch (DataAccessException e) {
             throw new UIException(e.getMessage(), e);
         }

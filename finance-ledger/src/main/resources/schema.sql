@@ -21,5 +21,7 @@ CREATE TABLE IF NOT EXISTS transactions(
     category TEXT NOT NULL,
     --change schema in pgAdmin later
     description VARCHAR(50) NOT NULL,
-    user_id BIGINT REFERENCES users(id)
+    user_id BIGINT REFERENCES users(id),
+    --ADD TO PGadmin LATER
+    updated_at TIMESTAMPTZ DEFAULT NOW()
 );

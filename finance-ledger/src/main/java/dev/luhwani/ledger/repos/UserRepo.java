@@ -67,7 +67,7 @@ public class UserRepo {
     }
 
     public List<Transaction2> getUserTransactions(Long userId) {
-        String sql = "SELECT date, kobo_amt, entry_type, category, description, user_id FROM transactions WHERE user_id = ?;";
+        String sql = "SELECT id, date, kobo_amt, entry_type, category, description, user_id FROM transactions WHERE user_id = ?;";
         try (
             Connection conn = ConnectionManager.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql);
         ) {
@@ -75,12 +75,13 @@ public class UserRepo {
             List<Transaction2> trs = new ArrayList<>();
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
+                    Long id = rs.getLong("id");
                     LocalDate date = (LocalDate) rs.getObject("date");
                     Long koboAmt = rs.getLong("kobo_amt");
                     EntryType entryType = EntryType.valueOf(rs.getString("entry_type"));
                     Category category= Category.valueOf(rs.getString("category"));
                     String description = rs.getString("description");
-                    Transaction2 tr = new Transaction2(date, koboAmt, entryType, category, description, userId);
+                    Transaction2 tr = new Transaction2(id, date, koboAmt, entryType, category, description, userId);
                     trs.add(tr);
                 }
             }
