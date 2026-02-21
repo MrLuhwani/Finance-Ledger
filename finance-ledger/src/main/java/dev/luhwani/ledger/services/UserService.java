@@ -43,9 +43,7 @@ public class UserService {
             List<Transaction2> transactionList = repo.getUserTransactions(loginData.id());
             repo.setLastLogin(loginData.id());
             Optional<User> user = Optional.of(new User(loginData.id(), loginData.email(), loginData.username()));
-            if (!transactionList.isEmpty()) {
-                user.get().setTransactionList(transactionList);
-            }
+            user.get().setTransactionList(transactionList);
             return user;
         } catch (DataAccessException e) {
             throw new UIException(e.getMessage(), e);

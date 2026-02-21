@@ -33,9 +33,11 @@ public class User {
     }
 
     public void setTransactionList(List<Transaction2> trList) {
-        transactions = trList;
+        if (!trList.isEmpty()) {
+            transactions = trList;   
+        }
     }
-    
+
     public void addTransaction(Transaction2 t) {
         transactions.add(t);
     }
