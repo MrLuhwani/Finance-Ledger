@@ -120,9 +120,9 @@ public class App {
                 Set new Username:
                 1.Between 5 - 14 characters long
                 2.No space
-                3.Contains letters
-                4.Can contain numbers
-                5.Underscores and hyphens accepted""");
+                3.Can contain numbers
+                4.Underscores and hyphens accepted
+                5.Can't contain other symbols""");
         while (true) {
             System.out.print("Response: ");
             username = scanner.nextLine();
@@ -200,8 +200,9 @@ public class App {
                     3.Edit transaction
                     4.Delete transaction
                     5.Show monthly summary
-                    6.Change Password
-                    7.Delete Account
+                    6.Export monthly sommary to CSV
+                    7.Change Password
+                    8.Delete Account
                     0.Exit
                     Response: """);
             response = scanner.nextLine().trim();
@@ -211,9 +212,13 @@ public class App {
                 case "3" -> editTransaction(context.getTransactionService(), user);
                 case "4" -> LedgerUtils.deleteTransaction();
                 case "5" -> LedgerUtils.monthlySummary();
-                case "6" -> changePassword(user, context);
-                case "7" -> {
-                    //delete acct logic
+                case "6" -> {
+                    // delete acct logic
+                    System.out.println("Expor to CSV");
+                }
+                case "7" -> changePassword(user, context);
+                case "8" -> {
+                    // delete acct logic
                     System.out.println("Delete acct");
                 }
                 case "0" -> {
@@ -229,42 +234,23 @@ public class App {
         Transaction2 transaction2 = getTransactionDetails(user, transactionService, Optional.empty());
         try {
             transactionService.addTransaction(user, transaction2);
+            System.out.println("Transaction successfully saved!");
         } catch (UIException | NullPointerException e) {
             System.err.println(e.getMessage());
         }
     }
 
     private static void editTransaction(TransactionService transactionService, User user) {
+        int choiceInt = chooseTransaction(user.getTransactions());
         List<Transaction2> transactions = user.getTransactions();
-        if (transactions.isEmpty()) {
-            System.out.println("No transactions have been added yet");            
-        }
-        else {
-            System.out.println("id, Date, Amount, Category, Description");
-            int count = 1;
-            for (Transaction2 tr : transactions) {
-                System.out.println(count + ", " + tr.toString());
-            }
-        }
-        int choiceInt;
-        Transaction2 t2;
-        while (true) {
-            System.out.print("Enter the id for the transaction you wish to change: ");
-            String choice = scanner.nextLine().trim();
-            try {
-                choiceInt = Utils.validIntChoice(choice, transactions.size());
-                t2 = transactions.get(choiceInt - 1);
-                break;
-            } catch (NumberFormatException | IndexOutOfBoundsException e) {
-               System.err.println("Invalid input");
-            }
-        }
+        Transaction2 t2 = transactions.get(choiceInt - 1);
         System.out.println("Edit the required fields: ");
         Transaction2 tr = getTransactionDetails(user, transactionService, Optional.of(t2.id()));
         try {
             transactionService.editTransaction(user, tr);
             transactions.remove(choiceInt - 1);
             transactions.add(tr);
+            System.out.println("Transaction successfully saved!");
         } catch (UIException e) {
             System.err.println(e.getMessage());
         }
@@ -364,6 +350,30 @@ public class App {
             return new Transaction2(transactionId.get(), date, koboAmt, entryType, category, description, user.getId());
         }
         return new Transaction2(0L, date, koboAmt, entryType, category, description, user.getId());
+    }
+
+    private static int chooseTransaction(List<Transaction2> transactionList) {
+        if (transactionList.isEmpty()) {
+            System.out.println("No transactions have been added yet");
+        } else {
+            System.out.println("id, Date, Amount, Category, Description");
+            int count = 1;
+            for (Transaction2 tr : transactionList) {
+                System.out.println(count + ", " + tr.toString());
+            }
+        }
+        int choiceInt;
+        while (true) {
+            System.out.print("Enter the id for the transaction: ");
+            String choice = scanner.nextLine().trim();
+            try {
+                choiceInt = Utils.validIntChoice(choice, transactionList.size());
+                break;
+            } catch (NumberFormatException | IndexOutOfBoundsException e) {
+                System.err.println("Invalid input");
+            }
+        }
+        return choiceInt;
     }
 
     private static void changePassword(User user, AppContext context) {
