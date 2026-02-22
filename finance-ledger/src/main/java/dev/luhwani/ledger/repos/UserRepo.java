@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Optional;
 
 import dev.luhwani.ledger.customExceptions.DataAccessException;
+import dev.luhwani.ledger.customExceptions.UIException;
 import dev.luhwani.ledger.models.Category;
 import dev.luhwani.ledger.models.EntryType;
 import dev.luhwani.ledger.models.LoginData;
@@ -147,6 +148,16 @@ public class UserRepo {
             pstmt.executeUpdate();
         } catch (SQLException e) {
             throw new DataAccessException(e.getMessage(), e);
+        }
+    }
+
+    public void deleteAcct(Long userId) {
+        String sql = "DELETE FROM users WHERE id = ?";
+        try (Connection conn = ConnectionManager.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setLong(1, userId);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new UIException(e.getMessage(), e);
         }
     }
 }

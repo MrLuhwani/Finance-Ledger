@@ -217,8 +217,9 @@ public class App {
                 }
                 case "7" -> changePassword(user, context);
                 case "8" -> {
-                    // delete acct logic
-                    System.out.println("Delete acct");
+                    deleteAcct(user, context.getUserService());
+                    usingSystem = false;
+                    System.out.println("Exitting program...");
                 }
                 case "0" -> {
                     usingSystem = false;
@@ -455,5 +456,26 @@ public class App {
         } catch (UIException e) {
             System.err.println(e.getMessage());
         }
+    }
+
+    private static void deleteAcct(User user, UserService userService) {
+        while (true) {
+            System.out.println("""
+                    Are you sure you wish to delete your account?!
+                    Enter the number for your choice:
+                    1.Confirm
+                    2.Cancel""");
+            System.out.print("Response: ");
+            String choice = scanner.nextLine().trim();
+            if (choice.equals("1")) {
+                break;
+            } else if (choice.equals("2")) {
+                System.out.println("Operation cancelled...");
+                return;
+            } else {
+                System.out.println("Invalid input!");
+            }
+        }
+        userService.deleteUser(user.getId());
     }
 }

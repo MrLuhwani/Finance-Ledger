@@ -74,4 +74,11 @@ public class UserService {
         }
     }
 
+    public void deleteUser(Long userId) {
+        try {
+            repo.deleteAcct(userId);
+        } catch (DataAccessException e) {
+            throw new UIException(e.getMessage(), e);
+        }
+    }
 }
