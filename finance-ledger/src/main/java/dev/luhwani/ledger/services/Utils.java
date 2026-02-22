@@ -20,7 +20,7 @@ public class Utils {
 
     public static int validIntChoice(String choice, int range) {
         int choiceInt = Integer.parseInt(choice);
-        if (choiceInt > 0 || choiceInt <= range) {
+        if (choiceInt > 0 && choiceInt <= range) {
             return choiceInt;
         } else {
             throw new IndexOutOfBoundsException();

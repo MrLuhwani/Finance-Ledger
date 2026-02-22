@@ -35,9 +35,17 @@ public class TransactionService {
         }
     }
 
-    public void editTransaction(User user,Transaction2 transaction2) {
+    public void editTransaction(Transaction2 transaction2) {
         try {
             repo.editTransaction(transaction2);
+        } catch (DataAccessException e) {
+            throw new UIException(e.getMessage(), e);
+        }
+    }
+
+    public void deleteTransaction(Long id) {
+        try {
+            repo.removeTransaction(id);
         } catch (DataAccessException e) {
             throw new UIException(e.getMessage(), e);
         }

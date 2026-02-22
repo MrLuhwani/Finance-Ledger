@@ -73,4 +73,15 @@ public class TransactionRepo {
             throw new DataAccessException(e.getMessage(), e);
         }
     }
+
+    public void removeTransaction(Long id) {
+        String sql = "DELETE FROM transactions WHERE id = ?;";
+        try (Connection conn = ConnectionManager.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setLong(1, id);
+            ps.executeUpdate();
+        } catch (SQLException e) {
+            throw new DataAccessException(e.getMessage(), e);
+        }
+        
+    }
 }

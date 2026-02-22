@@ -210,10 +210,9 @@ public class App {
                 case "1" -> CsvUtils.getCSV();
                 case "2" -> addTransaction(context.getTransactionService(), user);
                 case "3" -> editTransaction(context.getTransactionService(), user);
-                case "4" -> LedgerUtils.deleteTransaction();
+                case "4" -> deleteTransaction(context.getTransactionService(), user);
                 case "5" -> LedgerUtils.monthlySummary();
                 case "6" -> {
-                    // delete acct logic
                     System.out.println("Expor to CSV");
                 }
                 case "7" -> changePassword(user, context);
@@ -241,19 +240,49 @@ public class App {
     }
 
     private static void editTransaction(TransactionService transactionService, User user) {
-        int choiceInt = chooseTransaction(user.getTransactions());
         List<Transaction2> transactions = user.getTransactions();
+        int choiceInt = chooseTransaction(transactions);
         Transaction2 t2 = transactions.get(choiceInt - 1);
         System.out.println("Edit the required fields: ");
         Transaction2 tr = getTransactionDetails(user, transactionService, Optional.of(t2.id()));
         try {
-            transactionService.editTransaction(user, tr);
+            transactionService.editTransaction(tr);
             transactions.remove(choiceInt - 1);
             transactions.add(tr);
             System.out.println("Transaction successfully saved!");
         } catch (UIException e) {
             System.err.println(e.getMessage());
         }
+    }
+
+    private static void deleteTransaction(TransactionService transactionService, User user) {
+        List<Transaction2> transactions = user.getTransactions();
+        int choiceInt = chooseTransaction(transactions);
+        while (true) {
+            System.out.println("""
+                Input number to confirm transaction deletion:
+                1.Confirm
+                2.Exit""");
+            System.out.print("Response: ");
+            String choice = scanner.nextLine().trim();
+            if (choice.equals("1")) {
+                break;
+            } else if (choice.equals("2")) {
+                System.out.println("Operation cancelled...");
+                return;
+            } else {
+                System.out.println("Invalid input!");
+            }
+        }
+        Transaction2 t = transactions.get(choiceInt - 1);
+        try{
+            transactionService.deleteTransaction(t.id());
+            transactions.remove(choiceInt - 1);
+            System.out.println("Transaction successfully deleted");
+        } catch (UIException e) {
+            System.err.println(e.getMessage());
+        }
+
     }
 
     private static Transaction2 getTransactionDetails(User user, TransactionService transactionService, Optional<Long> transactionId) {
@@ -428,4 +457,3 @@ public class App {
         }
     }
 }
-
