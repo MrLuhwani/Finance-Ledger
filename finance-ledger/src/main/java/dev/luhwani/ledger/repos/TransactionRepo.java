@@ -15,14 +15,14 @@ import dev.luhwani.ledger.models.Transaction2;
 
 public class TransactionRepo {
     
-    private EnumSet<Category> allCategories = EnumSet.allOf(Category.class);
+    private final EnumSet<Category> allCategories = EnumSet.allOf(Category.class);
 
     public EnumSet<Category> allCategories(){
         return allCategories;
     }
 
     public Optional<Transaction2> returnStoredTransaction(Transaction2 transaction2) {
-        String sql = "INSERT INTO transactions(date, koboAmt, entry_type, category, description, user_id) VALUES (?, ?, ?, ?, ?, ?);";
+        String sql = "INSERT INTO transactions(date, kobo_amt, entry_type, category, description, user_id) VALUES (?, ?, ?, ?, ?, ?);";
         LocalDate date = transaction2.date();
         Long koboAmt = transaction2.koboAmt();
         String entryType = String.valueOf(transaction2.entryType());

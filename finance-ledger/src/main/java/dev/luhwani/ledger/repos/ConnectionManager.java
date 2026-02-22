@@ -24,7 +24,7 @@ public class ConnectionManager {
      * Also note that this will return an exception after running because there was
      * no return value
      * of the query. So run this once to create your tables, then you can delete the
-     * call from main
+     * call from App.java
      */
     static void initDB() throws SQLException, IOException {
         Connection conn = getConnection();

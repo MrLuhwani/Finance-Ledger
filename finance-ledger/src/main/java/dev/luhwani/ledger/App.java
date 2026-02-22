@@ -1,7 +1,6 @@
 package dev.luhwani.ledger;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
@@ -135,8 +134,11 @@ public class App {
         LoginData loginData = new LoginData(0L, email, username, passwordHash, salt);
         try {
             Optional<User> newUser = userService.createUser(loginData);
-            System.out.println("Account created successfully");
-            return newUser;
+            if (newUser.isPresent()) {
+                System.out.println("Account created successfully");
+                return newUser;   
+            }
+            return Optional.empty();
         } catch (UIException e) {
             System.err.println(e.getMessage());
             return Optional.empty();
@@ -199,6 +201,7 @@ public class App {
                     4.Delete transaction
                     5.Show monthly summary
                     6.Change Password
+                    7.Delete Account
                     0.Exit
                     Response: """);
             response = scanner.nextLine().trim();
@@ -209,6 +212,10 @@ public class App {
                 case "4" -> LedgerUtils.deleteTransaction();
                 case "5" -> LedgerUtils.monthlySummary();
                 case "6" -> changePassword(user, context);
+                case "7" -> {
+                    //delete acct logic
+                    System.out.println("Delete acct");
+                }
                 case "0" -> {
                     usingSystem = false;
                     System.out.println("Exiting program...");
@@ -229,10 +236,15 @@ public class App {
 
     private static void editTransaction(TransactionService transactionService, User user) {
         List<Transaction2> transactions = user.getTransactions();
-        System.out.println("id, Date, Amount, Category, Description");
-        int count = 1;
-        for (Transaction2 tr : transactions) {
-            System.out.println(count + ", " + tr.toString());
+        if (transactions.isEmpty()) {
+            System.out.println("No transactions have been added yet");            
+        }
+        else {
+            System.out.println("id, Date, Amount, Category, Description");
+            int count = 1;
+            for (Transaction2 tr : transactions) {
+                System.out.println(count + ", " + tr.toString());
+            }
         }
         int choiceInt;
         Transaction2 t2;
@@ -279,7 +291,7 @@ public class App {
         System.out.println("Modify the fields as needed: ");
         while (true) {
             System.out.print("Enter the type of transaction(Income|Expense): ");
-            String type = scanner.nextLine().toLowerCase();
+            String type = scanner.nextLine().trim().toLowerCase();
             if (type.equals("income")) {
                 entryType = EntryType.INCOME;
                 break;
@@ -295,7 +307,7 @@ public class App {
             System.out.print("Enter the amount for your transaction: ");
             String amtString = scanner.nextLine().trim();
             try{
-                BigDecimal nairaAmt = new BigDecimal(amtString).setScale(2, RoundingMode.HALF_UP);
+                BigDecimal nairaAmt = new BigDecimal(amtString);
                 if (nairaAmt.scale() > 2) {
                    System.out.println("Amount must be in two decimal places"); 
                 } else if (nairaAmt.compareTo(BigDecimal.ZERO) <= 0) {
@@ -342,7 +354,7 @@ public class App {
             description = scanner.nextLine().trim();
             if (description.isEmpty()) {
                 System.out.println("Please enter a short description for your transaction! ");
-            } else if (description.length() >= 50){
+            } else if (description.length() > 50){
                 System.out.println("Description has exceeded character limit");
             } else {
                 break;
@@ -362,6 +374,10 @@ public class App {
         try {
             oldPasswordHash = userService.getPassword(user.getId());
             salt = userService.getSalt(user.getId());
+            if (oldPasswordHash.isEmpty() || salt.isEmpty()) {
+                System.out.println("Error while getting password");
+                return;
+            }
             while (true) {
                 System.out.print("Enter old password: ");
                 String oldPassword = scanner.nextLine();
@@ -402,3 +418,4 @@ public class App {
         }
     }
 }
+
