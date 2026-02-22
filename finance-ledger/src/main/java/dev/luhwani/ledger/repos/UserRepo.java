@@ -76,7 +76,7 @@ public class UserRepo {
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
                     Long id = rs.getLong("id");
-                    LocalDate date = (LocalDate) rs.getObject("date");
+                    LocalDate date = rs.getDate("date").toLocalDate();
                     Long koboAmt = rs.getLong("kobo_amt");
                     EntryType entryType = EntryType.valueOf(rs.getString("entry_type"));
                     Category category= Category.valueOf(rs.getString("category"));
