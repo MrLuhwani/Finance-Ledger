@@ -18,6 +18,6 @@ CREATE TABLE IF NOT EXISTS transactions(
     entry_type VARCHAR(10) NOT NULL CHECK (entry_type IN ('INCOME', 'EXPENSE')),
     category TEXT NOT NULL,
     description VARCHAR(50) NOT NULL,
-    user_id BIGINT REFERENCES users(id),
+    user_id BIGINT REFERENCES users(id) ON DELETE CASCADE,
     updated_at TIMESTAMPTZ
 );
