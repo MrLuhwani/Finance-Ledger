@@ -274,7 +274,7 @@ public class App {
         try {
             transactionService.addTransaction(user, transaction);
             System.out.println("Transaction successfully saved!");
-        } catch (UIException | NullPointerException e) {
+        } catch (UIException e) {
             System.err.println(e.getMessage());
         }
     }

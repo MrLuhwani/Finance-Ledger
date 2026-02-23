@@ -29,7 +29,7 @@ public class TransactionService {
                 user.addTransaction(tr.get());
                 return;
             }
-            throw new NullPointerException("ID couldn't be retrieved while storing transaction");
+            throw new UIException("ID couldn't be retrieved while storing transaction");
         } catch (DataAccessException e) {
             throw new UIException(e.getMessage(), e);
         }

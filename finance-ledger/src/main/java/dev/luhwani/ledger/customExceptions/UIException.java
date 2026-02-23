@@ -6,4 +6,8 @@ public class UIException extends RuntimeException {
         super(message, cause);
     }
 
+    public UIException(String string) {
+        super(string);
+    }
+
 }
