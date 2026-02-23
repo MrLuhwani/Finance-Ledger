@@ -474,7 +474,7 @@ public class App {
         printTransactions(transactionList);
         int choiceInt;
         while (true) {
-            System.out.print("Enter the id for the transaction: ");
+            System.out.print("Enter the number of the transaction: ");
             String choice = scanner.nextLine().trim();
             try {
                 choiceInt = Utils.validIntChoice(choice, transactionList.size());

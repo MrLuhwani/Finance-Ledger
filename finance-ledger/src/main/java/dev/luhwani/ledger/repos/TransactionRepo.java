@@ -32,6 +32,7 @@ public class TransactionRepo {
         try (
                 Connection conn = ConnectionManager.getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+            conn.setAutoCommit(false);
             pstmt.setObject(1, date);
             pstmt.setLong(2, koboAmt);
             pstmt.setString(3, entryType);
@@ -39,6 +40,7 @@ public class TransactionRepo {
             pstmt.setString(5, description);
             pstmt.setLong(6, userId);
             pstmt.executeUpdate();
+            conn.commit();
             try (ResultSet generatedId = pstmt.getGeneratedKeys();) {
                 if (generatedId.next()) {
                     Long id = generatedId.getLong(1);
@@ -63,12 +65,14 @@ public class TransactionRepo {
         String category = String.valueOf(tr.category());
         String description = tr.description();
         try (Connection conn = ConnectionManager.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            conn.setAutoCommit(false);
             ps.setObject(1, date);
             ps.setLong(2, koboAmt);
             ps.setString(3, entry);
             ps.setString(4, category);
             ps.setString(5, description);
             ps.executeUpdate();
+            conn.commit();
         } catch (SQLException e) {
             throw new DataAccessException(e.getMessage(), e);
         }
@@ -77,8 +81,10 @@ public class TransactionRepo {
     public void removeTransaction(Long id) {
         String sql = "DELETE FROM transactions WHERE id = ?;";
         try (Connection conn = ConnectionManager.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            conn.setAutoCommit(false);
             ps.setLong(1, id);
             ps.executeUpdate();
+            conn.commit();
         } catch (SQLException e) {
             throw new DataAccessException(e.getMessage(), e);
         }

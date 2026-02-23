@@ -50,11 +50,13 @@ public class UserRepo {
         try (
                 Connection conn = ConnectionManager.getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);) {
+            conn.setAutoCommit(false);
             pstmt.setString(1, email);
             pstmt.setString(2, salt);
             pstmt.setString(3, username);
             pstmt.setBytes(4, passwordHash);
             pstmt.executeUpdate();
+            conn.commit();
             try (ResultSet generatedKeys = pstmt.getGeneratedKeys()) {
                 if (generatedKeys.next()) {
                     Long id = generatedKeys.getLong(1);
@@ -143,10 +145,12 @@ public class UserRepo {
         String sql = "UPDATE users SET password_hash = ?, password_salt = ? WHERE id = ?";
         try (Connection conn = ConnectionManager.getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(sql)) {
+            conn.setAutoCommit(false);
             pstmt.setBytes(1, passwordHash);
             pstmt.setString(2, salt);
             pstmt.setLong(3, userId);
             pstmt.executeUpdate();
+            conn.commit();
         } catch (SQLException e) {
             throw new DataAccessException(e.getMessage(), e);
         }
@@ -155,8 +159,10 @@ public class UserRepo {
     public void deleteAcct(Long userId) {
         String sql = "DELETE FROM users WHERE id = ?";
         try (Connection conn = ConnectionManager.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            conn.setAutoCommit(false);
             ps.setLong(1, userId);
             ps.executeUpdate();
+            conn.commit();
         } catch (SQLException e) {
             throw new UIException(e.getMessage(), e);
         }

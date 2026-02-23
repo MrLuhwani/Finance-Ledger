@@ -3,9 +3,6 @@ package dev.luhwani.ledger.models;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
-//this is going to be the actual transaction object.
-// this class was just made so that I can still work without having
-//to deal with too many ompiler warnings if I change the original class
 public record Transaction(
                 Long id,
                 LocalDate date,
