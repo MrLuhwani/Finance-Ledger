@@ -9,6 +9,7 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
 import dev.luhwani.ledger.appContext.AppContext;
 import dev.luhwani.ledger.customExceptions.UIException;
@@ -195,27 +196,29 @@ public class App {
             System.out.print("""
                     Enter the number for what you want to choose
                     1.Show Transaction History
-                    2.Add transaction
-                    3.Edit transaction
-                    4.Delete transaction
-                    5.Show monthly summary
-                    6.Export monthly sommary to CSV
-                    7.Change Password
-                    8.Delete Account
+                    2.Filter history by category
+                    3.Add transaction
+                    4.Edit transaction
+                    5.Delete transaction
+                    6.Show monthly summary
+                    7.Export monthly summary to CSV
+                    8.Change Password
+                    9.Delete Account
                     0.Exit
                     Response: """);
             response = scanner.nextLine().trim();
             switch (response) {
                 case "1" -> printTransactions(user.getTransactions());
-                case "2" -> addTransaction(context.getTransactionService(), user);
-                case "3" -> editTransaction(context.getTransactionService(), user);
-                case "4" -> deleteTransaction(context.getTransactionService(), user);
-                case "5" -> LedgerUtils.monthlySummary();
-                case "6" -> {
+                case "2" -> filterByCategory(user.getTransactions(), context.getTransactionService());
+                case "3" -> addTransaction(context.getTransactionService(), user);
+                case "4" -> editTransaction(context.getTransactionService(), user);
+                case "5" -> deleteTransaction(context.getTransactionService(), user);
+                case "6" -> LedgerUtils.monthlySummary();
+                case "7" -> {
                     System.out.println("Expor to CSV");
                 }
-                case "7" -> changePassword(user, context);
-                case "8" -> {
+                case "8" -> changePassword(user, context);
+                case "9" -> {
                     if (deleteAcct(user, context.getUserService())) {
                         usingSystem = false;
                         System.out.println("Exitting program...");   
@@ -230,6 +233,38 @@ public class App {
                 default -> System.out.println("Invalid input");
             }
         }
+    }
+
+    private static void filterByCategory(List<Transaction2> transactions, TransactionService transactionService) {
+        EnumSet<Category> categorySet = transactionService.getCategories();
+        int count = 0;
+        System.out.println("__Categories__");
+        for (Category c : categorySet) {
+            count++;
+            System.out.println(count + "." + c);
+        }
+        List<Transaction2> filteredTransactions;
+        while (true) {
+            String categoryChoice;
+            System.out.print("Enter the number for the category filter: ");
+            categoryChoice = scanner.nextLine().trim();
+            if (categoryChoice.isEmpty()) {
+                System.out.println("Please enter a valid category for your transaction! ");
+                continue;
+            }
+            List<Category> categoryList = new ArrayList<>(categorySet);
+            int choiceInt;
+            try {
+                choiceInt = Utils.validIntChoice(categoryChoice, categoryList.size());
+                Category category = categoryList.get(choiceInt - 1);
+                filteredTransactions = transactions.stream().filter(t -> t.category().equals(category))
+                        .collect(Collectors.toList());
+                break;
+            } catch (NumberFormatException | IndexOutOfBoundsException e) {
+                System.err.println("Invalid input");
+            }
+        }
+        printTransactions(filteredTransactions);
     }
 
     private static void addTransaction(TransactionService transactionService, User user) {
@@ -408,6 +443,7 @@ public class App {
             int count = 1;
             for (Transaction2 tr : transactionList) {
                 System.out.println(count + ", " + tr.toString());
+                count++;
             }
         }
     }
