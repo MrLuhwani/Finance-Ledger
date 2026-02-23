@@ -6,7 +6,7 @@ import java.util.Optional;
 import dev.luhwani.ledger.customExceptions.DataAccessException;
 import dev.luhwani.ledger.customExceptions.UIException;
 import dev.luhwani.ledger.models.Category;
-import dev.luhwani.ledger.models.Transaction2;
+import dev.luhwani.ledger.models.Transaction;
 import dev.luhwani.ledger.models.User;
 import dev.luhwani.ledger.repos.TransactionRepo;
 
@@ -22,9 +22,9 @@ public class TransactionService {
         return repo.allCategories();
     }
 
-    public void addTransaction(User user, Transaction2 transaction2) {
+    public void addTransaction(User user, Transaction transaction) {
         try {
-            Optional<Transaction2> tr = repo.returnStoredTransaction(transaction2);
+            Optional<Transaction> tr = repo.returnStoredTransaction(transaction);
             if (tr.isPresent()) {
                 user.addTransaction(tr.get());
                 return;
@@ -35,9 +35,9 @@ public class TransactionService {
         }
     }
 
-    public void editTransaction(Transaction2 transaction2) {
+    public void editTransaction(Transaction transaction) {
         try {
-            repo.editTransaction(transaction2);
+            repo.editTransaction(transaction);
         } catch (DataAccessException e) {
             throw new UIException(e.getMessage(), e);
         }

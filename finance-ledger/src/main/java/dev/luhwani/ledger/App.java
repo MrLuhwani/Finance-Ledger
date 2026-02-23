@@ -19,7 +19,7 @@ import dev.luhwani.ledger.customExceptions.UIException;
 import dev.luhwani.ledger.models.Category;
 import dev.luhwani.ledger.models.EntryType;
 import dev.luhwani.ledger.models.LoginData;
-import dev.luhwani.ledger.models.Transaction2;
+import dev.luhwani.ledger.models.Transaction;
 import dev.luhwani.ledger.models.User;
 import dev.luhwani.ledger.repos.TransactionRepo;
 import dev.luhwani.ledger.repos.UserRepo;
@@ -237,7 +237,7 @@ public class App {
         }
     }
 
-    private static void filterByCategory(List<Transaction2> transactions, TransactionService transactionService) {
+    private static void filterByCategory(List<Transaction> transactions, TransactionService transactionService) {
         EnumSet<Category> categorySet = transactionService.getCategories();
         int count = 0;
         System.out.println("__Categories__");
@@ -245,7 +245,7 @@ public class App {
             count++;
             System.out.println(count + "." + c);
         }
-        List<Transaction2> filteredTransactions;
+        List<Transaction> filteredTransactions;
         while (true) {
             String categoryChoice;
             System.out.print("Enter the number for the category filter: ");
@@ -270,9 +270,9 @@ public class App {
     }
 
     private static void addTransaction(TransactionService transactionService, User user) {
-        Transaction2 transaction2 = getTransactionDetails(user, transactionService, Optional.empty());
+        Transaction transaction = getTransactionDetails(user, transactionService, Optional.empty());
         try {
-            transactionService.addTransaction(user, transaction2);
+            transactionService.addTransaction(user, transaction);
             System.out.println("Transaction successfully saved!");
         } catch (UIException | NullPointerException e) {
             System.err.println(e.getMessage());
@@ -280,11 +280,11 @@ public class App {
     }
 
     private static void editTransaction(TransactionService transactionService, User user) {
-        List<Transaction2> transactions = user.getTransactions();
+        List<Transaction> transactions = user.getTransactions();
         int choiceInt = chooseTransaction(transactions);
-        Transaction2 t2 = transactions.get(choiceInt - 1);
+        Transaction t2 = transactions.get(choiceInt - 1);
         System.out.println("Edit the required fields: ");
-        Transaction2 tr = getTransactionDetails(user, transactionService, Optional.of(t2.id()));
+        Transaction tr = getTransactionDetails(user, transactionService, Optional.of(t2.id()));
         try {
             transactionService.editTransaction(tr);
             transactions.remove(choiceInt - 1);
@@ -296,7 +296,7 @@ public class App {
     }
 
     private static void deleteTransaction(TransactionService transactionService, User user) {
-        List<Transaction2> transactions = user.getTransactions();
+        List<Transaction> transactions = user.getTransactions();
         int choiceInt = chooseTransaction(transactions);
         while (true) {
             System.out.println("""
@@ -314,7 +314,7 @@ public class App {
                 System.out.println("Invalid input!");
             }
         }
-        Transaction2 t = transactions.get(choiceInt - 1);
+        Transaction t = transactions.get(choiceInt - 1);
         try {
             transactionService.deleteTransaction(t.id());
             transactions.remove(choiceInt - 1);
@@ -325,12 +325,12 @@ public class App {
 
     }
 
-    private static void monthlySummary(List<Transaction2> transactions) {
+    private static void monthlySummary(List<Transaction> transactions) {
         if (transactions.isEmpty()) {
             System.out.println("No transaction's saved");
             return;
         }
-        List<Transaction2> filteredTransactions;
+        List<Transaction> filteredTransactions;
         String monthName;
         while (true) {
             try {
@@ -373,7 +373,7 @@ public class App {
         System.out.println("Summary Completed");
     }
 
-    private static Transaction2 getTransactionDetails(User user, TransactionService transactionService,
+    private static Transaction getTransactionDetails(User user, TransactionService transactionService,
             Optional<Long> transactionId) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         LocalDate date;
@@ -465,12 +465,12 @@ public class App {
             }
         }
         if (transactionId.isPresent()) {
-            return new Transaction2(transactionId.get(), date, koboAmt, entryType, category, description, user.getId());
+            return new Transaction(transactionId.get(), date, koboAmt, entryType, category, description, user.getId());
         }
-        return new Transaction2(0L, date, koboAmt, entryType, category, description, user.getId());
+        return new Transaction(0L, date, koboAmt, entryType, category, description, user.getId());
     }
 
-    private static int chooseTransaction(List<Transaction2> transactionList) {
+    private static int chooseTransaction(List<Transaction> transactionList) {
         printTransactions(transactionList);
         int choiceInt;
         while (true) {
@@ -486,13 +486,13 @@ public class App {
         return choiceInt;
     }
 
-    private static void printTransactions(List<Transaction2> transactionList) {
+    private static void printTransactions(List<Transaction> transactionList) {
         if (transactionList.isEmpty()) {
             System.out.println("No transactions have been added yet");
         } else {
             System.out.println("id, Date, Amount, Category, Description");
             int count = 1;
-            for (Transaction2 tr : transactionList) {
+            for (Transaction tr : transactionList) {
                 System.out.println(count + ", " + tr.toString());
                 count++;
             }

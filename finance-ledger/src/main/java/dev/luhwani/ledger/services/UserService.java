@@ -6,7 +6,7 @@ import java.util.Optional;
 import dev.luhwani.ledger.customExceptions.DataAccessException;
 import dev.luhwani.ledger.customExceptions.UIException;
 import dev.luhwani.ledger.models.LoginData;
-import dev.luhwani.ledger.models.Transaction2;
+import dev.luhwani.ledger.models.Transaction;
 import dev.luhwani.ledger.models.User;
 import dev.luhwani.ledger.repos.UserRepo;
 
@@ -40,7 +40,7 @@ public class UserService {
 
     public Optional<User> login(LoginData loginData) {
         try {
-            List<Transaction2> transactionList = repo.getUserTransactions(loginData.id());
+            List<Transaction> transactionList = repo.getUserTransactions(loginData.id());
             repo.setLastLogin(loginData.id());
             Optional<User> user = Optional.of(new User(loginData.id(), loginData.email(), loginData.username()));
             user.get().setTransactionList(transactionList);

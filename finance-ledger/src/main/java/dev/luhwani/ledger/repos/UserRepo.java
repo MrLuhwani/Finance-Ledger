@@ -15,7 +15,7 @@ import dev.luhwani.ledger.customExceptions.UIException;
 import dev.luhwani.ledger.models.Category;
 import dev.luhwani.ledger.models.EntryType;
 import dev.luhwani.ledger.models.LoginData;
-import dev.luhwani.ledger.models.Transaction2;
+import dev.luhwani.ledger.models.Transaction;
 
 public class UserRepo {
 
@@ -67,13 +67,13 @@ public class UserRepo {
         }
     }
 
-    public List<Transaction2> getUserTransactions(Long userId) {
+    public List<Transaction> getUserTransactions(Long userId) {
         String sql = "SELECT id, date, kobo_amt, entry_type, category, description, user_id FROM transactions WHERE user_id = ?;";
         try (
                 Connection conn = ConnectionManager.getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(sql);) {
             pstmt.setLong(1, userId);
-            List<Transaction2> trs = new ArrayList<>();
+            List<Transaction> trs = new ArrayList<>();
             try (ResultSet rs = pstmt.executeQuery()) {
                 while (rs.next()) {
                     Long id = rs.getLong("id");
@@ -82,7 +82,7 @@ public class UserRepo {
                     EntryType entryType = EntryType.valueOf(rs.getString("entry_type"));
                     Category category = Category.valueOf(rs.getString("category"));
                     String description = rs.getString("description");
-                    Transaction2 tr = new Transaction2(id, date, koboAmt, entryType, category, description, userId);
+                    Transaction tr = new Transaction(id, date, koboAmt, entryType, category, description, userId);
                     trs.add(tr);
                 }
             }

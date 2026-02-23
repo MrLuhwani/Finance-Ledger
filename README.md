@@ -43,7 +43,7 @@ FinanceLedger
 │  │     │           │  ├─ Category.java  
 │  │     │           │  ├─ EntryType.java  
 │  │     │           │  ├─ LoginData.java  
-│  │     │           │  ├─ Transaction2.java  
+│  │     │           │  ├─ Transaction.java  
 │  │     │           │  └─ User.java  
 │  │     │           ├─ repos/  
 │  │     │           │  ├─ ConnectionManager.java  

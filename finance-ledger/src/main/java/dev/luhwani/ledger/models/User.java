@@ -8,7 +8,7 @@ public class User {
     private final String email;
     private final Long id;
     private final String username;
-    private List<Transaction2> transactions = new ArrayList<>();
+    private List<Transaction> transactions = new ArrayList<>();
 
     public User(Long id, String email, String username) {
         this.email = email;
@@ -28,17 +28,17 @@ public class User {
         return username;
     }
 
-    public List<Transaction2> getTransactions() {
+    public List<Transaction> getTransactions() {
         return transactions;
     }
 
-    public void setTransactionList(List<Transaction2> trList) {
+    public void setTransactionList(List<Transaction> trList) {
         if (!trList.isEmpty()) {
             transactions = trList;
         }
     }
 
-    public void addTransaction(Transaction2 t) {
+    public void addTransaction(Transaction t) {
         transactions.add(t);
     }
 }

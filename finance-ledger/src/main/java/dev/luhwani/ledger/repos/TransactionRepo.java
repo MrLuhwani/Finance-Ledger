@@ -11,7 +11,7 @@ import java.util.Optional;
 
 import dev.luhwani.ledger.customExceptions.DataAccessException;
 import dev.luhwani.ledger.models.Category;
-import dev.luhwani.ledger.models.Transaction2;
+import dev.luhwani.ledger.models.Transaction;
 
 public class TransactionRepo {
 
@@ -21,14 +21,14 @@ public class TransactionRepo {
         return allCategories;
     }
 
-    public Optional<Transaction2> returnStoredTransaction(Transaction2 transaction2) {
+    public Optional<Transaction> returnStoredTransaction(Transaction transaction) {
         String sql = "INSERT INTO transactions(date, kobo_amt, entry_type, category, description, user_id) VALUES (?, ?, ?, ?, ?, ?);";
-        LocalDate date = transaction2.date();
-        Long koboAmt = transaction2.koboAmt();
-        String entryType = String.valueOf(transaction2.entryType());
-        String category = String.valueOf(transaction2.category());
-        String description = transaction2.description();
-        Long userId = transaction2.userId();
+        LocalDate date = transaction.date();
+        Long koboAmt = transaction.koboAmt();
+        String entryType = String.valueOf(transaction.entryType());
+        String category = String.valueOf(transaction.category());
+        String description = transaction.description();
+        Long userId = transaction.userId();
         try (
                 Connection conn = ConnectionManager.getConnection();
                 PreparedStatement pstmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
@@ -42,8 +42,8 @@ public class TransactionRepo {
             try (ResultSet generatedId = pstmt.getGeneratedKeys();) {
                 if (generatedId.next()) {
                     Long id = generatedId.getLong(1);
-                    Transaction2 tr = new Transaction2(id, date, koboAmt, transaction2.entryType(),
-                            transaction2.category(), description, userId);
+                    Transaction tr = new Transaction(id, date, koboAmt, transaction.entryType(),
+                            transaction.category(), description, userId);
                     return Optional.of(tr);
                 }
             }
@@ -53,7 +53,7 @@ public class TransactionRepo {
         return Optional.empty();
     }
 
-    public void editTransaction(Transaction2 tr) {
+    public void editTransaction(Transaction tr) {
         String sql = """
                 UPDATE transactions
                 SET date = ?, kobo_amt = ?, entry_type = ?, category = ?, description = ?, updated_at = NOW() ;""";
