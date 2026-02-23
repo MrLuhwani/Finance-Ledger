@@ -2,11 +2,14 @@ package dev.luhwani.ledger;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.Month;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.time.format.TextStyle;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.Scanner;
 import java.util.stream.Collectors;
@@ -24,7 +27,6 @@ import dev.luhwani.ledger.services.TransactionService;
 import dev.luhwani.ledger.services.SecurityService;
 import dev.luhwani.ledger.services.UserService;
 import dev.luhwani.ledger.services.Utils;
-import dev.luhwani.ledger.utilities.LedgerUtils;
 
 public class App {
 
@@ -136,7 +138,7 @@ public class App {
             Optional<User> newUser = userService.createUser(loginData);
             if (newUser.isPresent()) {
                 System.out.println("Account created successfully");
-                return newUser;   
+                return newUser;
             }
             return Optional.empty();
         } catch (UIException e) {
@@ -213,7 +215,7 @@ public class App {
                 case "3" -> addTransaction(context.getTransactionService(), user);
                 case "4" -> editTransaction(context.getTransactionService(), user);
                 case "5" -> deleteTransaction(context.getTransactionService(), user);
-                case "6" -> LedgerUtils.monthlySummary();
+                case "6" -> monthlySummary(user.getTransactions());
                 case "7" -> {
                     System.out.println("Expor to CSV");
                 }
@@ -221,7 +223,7 @@ public class App {
                 case "9" -> {
                     if (deleteAcct(user, context.getUserService())) {
                         usingSystem = false;
-                        System.out.println("Exitting program...");   
+                        System.out.println("Exitting program...");
                     } else {
                         System.out.println("Operation cancelled...");
                     }
@@ -298,9 +300,9 @@ public class App {
         int choiceInt = chooseTransaction(transactions);
         while (true) {
             System.out.println("""
-                Input number to confirm transaction deletion:
-                1.Confirm
-                2.Exit""");
+                    Input number to confirm transaction deletion:
+                    1.Confirm
+                    2.Exit""");
             System.out.print("Response: ");
             String choice = scanner.nextLine().trim();
             if (choice.equals("1")) {
@@ -313,7 +315,7 @@ public class App {
             }
         }
         Transaction2 t = transactions.get(choiceInt - 1);
-        try{
+        try {
             transactionService.deleteTransaction(t.id());
             transactions.remove(choiceInt - 1);
             System.out.println("Transaction successfully deleted");
@@ -323,7 +325,56 @@ public class App {
 
     }
 
-    private static Transaction2 getTransactionDetails(User user, TransactionService transactionService, Optional<Long> transactionId) {
+    private static void monthlySummary(List<Transaction2> transactions) {
+        if (transactions.isEmpty()) {
+            System.out.println("No transaction's saved");
+            return;
+        }
+        List<Transaction2> filteredTransactions;
+        String monthName;
+        while (true) {
+            try {
+                System.out.print("Enter the number of the monthNum you wish to check (1-12): ");
+                String month = scanner.nextLine();
+                // filter will later be adjusted not to be only for that year
+                int currentYear = LocalDate.now().getYear();
+                int monthNum = Utils.validIntChoice(month, 12);
+                filteredTransactions = transactions.stream()
+                        .filter(t -> t.date().getMonthValue() == monthNum && t.date().getYear() == currentYear)
+                        .collect(Collectors.toList());
+                if (filteredTransactions.isEmpty()) {
+                    System.out.println("No records for this month!");
+                    return;
+                }
+                monthName = Month.of(monthNum).getDisplayName(TextStyle.FULL, Locale.ENGLISH);
+                break;
+            } catch (NumberFormatException | IndexOutOfBoundsException e) {
+                System.out.println("Invalid input!");
+            }
+        }
+        Long totalExpKobo = filteredTransactions.stream().filter(tr -> tr.entryType().equals(EntryType.EXPENSE))
+                .mapToLong(tr -> tr.koboAmt()).sum();
+        Long totalIncKobo = filteredTransactions.stream().filter(tr -> tr.entryType().equals(EntryType.INCOME))
+                .mapToLong(tr -> tr.koboAmt()).sum();
+        BigDecimal totalExp = BigDecimal.valueOf(totalExpKobo).divide(BigDecimal.valueOf(100));
+        BigDecimal totalInc = BigDecimal.valueOf(totalIncKobo).divide(BigDecimal.valueOf(100));
+        Long maxIncKobo = filteredTransactions.stream().filter(tr -> tr.entryType().equals(EntryType.INCOME))
+                .mapToLong(tr -> tr.koboAmt()).max().orElse(0);
+        Long maxExpKobo = filteredTransactions.stream().filter(tr -> tr.entryType().equals(EntryType.EXPENSE))
+                .mapToLong(tr -> tr.koboAmt()).max().orElse(0);
+        BigDecimal maxExp = BigDecimal.valueOf(maxExpKobo).divide(BigDecimal.valueOf(100));
+        BigDecimal maxInc = BigDecimal.valueOf(maxIncKobo).divide(BigDecimal.valueOf(100));
+        System.out.println("Summary for the Month of " + monthName + ": ");
+        printTransactions(filteredTransactions);
+        System.out.println("Total income: " + totalInc);
+        System.out.println("Total Expense: " + totalExp);
+        System.out.println("Highest income: " + maxInc);
+        System.out.println("Highest expense: " + maxExp);
+        System.out.println("Summary Completed");
+    }
+
+    private static Transaction2 getTransactionDetails(User user, TransactionService transactionService,
+            Optional<Long> transactionId) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         LocalDate date;
         while (true) {
@@ -359,10 +410,10 @@ public class App {
         while (true) {
             System.out.print("Enter the amount for your transaction: ");
             String amtString = scanner.nextLine().trim();
-            try{
+            try {
                 BigDecimal nairaAmt = new BigDecimal(amtString);
                 if (nairaAmt.scale() > 2) {
-                   System.out.println("Amount must be in two decimal places"); 
+                    System.out.println("Amount must be in two decimal places");
                 } else if (nairaAmt.compareTo(BigDecimal.ZERO) <= 0) {
                     System.out.println("Amount can't be less than or equal to zero");
                 } else {
@@ -396,18 +447,18 @@ public class App {
                 category = categoryList.get(choiceInt - 1);
                 break;
             } catch (NumberFormatException | IndexOutOfBoundsException e) {
-               System.err.println("Invalid input");
+                System.err.println("Invalid input");
             }
         }
         String description;
-        //hopefully the frontend can implement a way to show the num of chars
-        //as the user is typing
+        // hopefully the frontend can implement a way to show the num of chars
+        // as the user is typing
         while (true) {
             System.out.print("Enter a short description for your transaction (not more than 50 chars): ");
             description = scanner.nextLine().trim();
             if (description.isEmpty()) {
                 System.out.println("Please enter a short description for your transaction! ");
-            } else if (description.length() > 50){
+            } else if (description.length() > 50) {
                 System.out.println("Description has exceeded character limit");
             } else {
                 break;

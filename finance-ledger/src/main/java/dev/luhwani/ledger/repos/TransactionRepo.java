@@ -14,10 +14,10 @@ import dev.luhwani.ledger.models.Category;
 import dev.luhwani.ledger.models.Transaction2;
 
 public class TransactionRepo {
-    
+
     private final EnumSet<Category> allCategories = EnumSet.allOf(Category.class);
 
-    public EnumSet<Category> allCategories(){
+    public EnumSet<Category> allCategories() {
         return allCategories;
     }
 
@@ -37,7 +37,7 @@ public class TransactionRepo {
             pstmt.setString(3, entryType);
             pstmt.setString(4, category);
             pstmt.setString(5, description);
-            pstmt.setLong(6,userId);
+            pstmt.setLong(6, userId);
             pstmt.executeUpdate();
             try (ResultSet generatedId = pstmt.getGeneratedKeys();) {
                 if (generatedId.next()) {
@@ -55,8 +55,8 @@ public class TransactionRepo {
 
     public void editTransaction(Transaction2 tr) {
         String sql = """
-        UPDATE transactions
-        SET date = ?, kobo_amt = ?, entry_type = ?, category = ?, description = ?, updated_at = NOW() ;""";
+                UPDATE transactions
+                SET date = ?, kobo_amt = ?, entry_type = ?, category = ?, description = ?, updated_at = NOW() ;""";
         LocalDate date = tr.date();
         Long koboAmt = tr.koboAmt();
         String entry = String.valueOf(tr.entryType());
@@ -82,6 +82,6 @@ public class TransactionRepo {
         } catch (SQLException e) {
             throw new DataAccessException(e.getMessage(), e);
         }
-        
+
     }
 }

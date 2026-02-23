@@ -11,9 +11,9 @@ import dev.luhwani.ledger.models.User;
 import dev.luhwani.ledger.repos.TransactionRepo;
 
 public class TransactionService {
-    
+
     private final TransactionRepo repo;
-    
+
     public TransactionService(TransactionRepo repo) {
         this.repo = repo;
     }
@@ -22,9 +22,9 @@ public class TransactionService {
         return repo.allCategories();
     }
 
-    public void addTransaction(User user,Transaction2 transaction2) {
+    public void addTransaction(User user, Transaction2 transaction2) {
         try {
-            Optional<Transaction2> tr =  repo.returnStoredTransaction(transaction2);
+            Optional<Transaction2> tr = repo.returnStoredTransaction(transaction2);
             if (tr.isPresent()) {
                 user.addTransaction(tr.get());
                 return;

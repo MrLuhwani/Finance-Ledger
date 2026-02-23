@@ -70,8 +70,8 @@ public class UserRepo {
     public List<Transaction2> getUserTransactions(Long userId) {
         String sql = "SELECT id, date, kobo_amt, entry_type, category, description, user_id FROM transactions WHERE user_id = ?;";
         try (
-            Connection conn = ConnectionManager.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql);
-        ) {
+                Connection conn = ConnectionManager.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(sql);) {
             pstmt.setLong(1, userId);
             List<Transaction2> trs = new ArrayList<>();
             try (ResultSet rs = pstmt.executeQuery()) {
@@ -80,7 +80,7 @@ public class UserRepo {
                     LocalDate date = rs.getDate("date").toLocalDate();
                     Long koboAmt = rs.getLong("kobo_amt");
                     EntryType entryType = EntryType.valueOf(rs.getString("entry_type"));
-                    Category category= Category.valueOf(rs.getString("category"));
+                    Category category = Category.valueOf(rs.getString("category"));
                     String description = rs.getString("description");
                     Transaction2 tr = new Transaction2(id, date, koboAmt, entryType, category, description, userId);
                     trs.add(tr);
@@ -141,7 +141,8 @@ public class UserRepo {
 
     public void updatePassword(Long userId, byte[] passwordHash, String salt) {
         String sql = "UPDATE users SET password_hash = ?, password_salt = ? WHERE id = ?";
-        try (Connection conn = ConnectionManager.getConnection(); PreparedStatement pstmt = conn.prepareStatement(sql)) {
+        try (Connection conn = ConnectionManager.getConnection();
+                PreparedStatement pstmt = conn.prepareStatement(sql)) {
             pstmt.setBytes(1, passwordHash);
             pstmt.setString(2, salt);
             pstmt.setLong(3, userId);
