@@ -7,6 +7,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.format.TextStyle;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Locale;
@@ -281,14 +282,18 @@ public class App {
 
     private static void editTransaction(TransactionService transactionService, User user) {
         List<Transaction> transactions = user.getTransactions();
-        int choiceInt = chooseTransaction(transactions);
-        Transaction t2 = transactions.get(choiceInt - 1);
+        Optional<Integer> choiceInt = chooseTransaction(transactions);
+        if (choiceInt.isEmpty()) {
+            return;
+        }
+        Transaction t2 = transactions.get(choiceInt.get() - 1);
         System.out.println("Edit the required fields: ");
         Transaction tr = getTransactionDetails(user, transactionService, Optional.of(t2.id()));
         try {
             transactionService.editTransaction(tr);
-            transactions.remove(choiceInt - 1);
+            transactions.remove(choiceInt.get() - 1);
             transactions.add(tr);
+            transactions.sort(Comparator.comparing(Transaction::date).reversed());
             System.out.println("Transaction successfully saved!");
         } catch (UIException e) {
             System.err.println(e.getMessage());
@@ -297,12 +302,15 @@ public class App {
 
     private static void deleteTransaction(TransactionService transactionService, User user) {
         List<Transaction> transactions = user.getTransactions();
-        int choiceInt = chooseTransaction(transactions);
+        Optional<Integer> choiceInt = chooseTransaction(transactions);
+        if (choiceInt.isEmpty()) {
+            return;
+        }
+        System.out.println("""
+                Input number to confirm transaction deletion:
+                1.Confirm
+                2.Exit""");
         while (true) {
-            System.out.println("""
-                    Input number to confirm transaction deletion:
-                    1.Confirm
-                    2.Exit""");
             System.out.print("Response: ");
             String choice = scanner.nextLine().trim();
             if (choice.equals("1")) {
@@ -314,10 +322,11 @@ public class App {
                 System.out.println("Invalid input!");
             }
         }
-        Transaction t = transactions.get(choiceInt - 1);
+        Transaction t = transactions.get(choiceInt.get() - 1);
         try {
             transactionService.deleteTransaction(t.id());
-            transactions.remove(choiceInt - 1);
+            transactions.remove(choiceInt.get() - 1);
+            transactions.sort(Comparator.comparing(Transaction::date).reversed());
             System.out.println("Transaction successfully deleted");
         } catch (UIException e) {
             System.err.println(e.getMessage());
@@ -470,8 +479,11 @@ public class App {
         return new Transaction(0L, date, koboAmt, entryType, category, description, user.getId());
     }
 
-    private static int chooseTransaction(List<Transaction> transactionList) {
+    private static Optional<Integer> chooseTransaction(List<Transaction> transactionList) {
         printTransactions(transactionList);
+        if (transactionList.isEmpty()) {
+            return Optional.empty();
+        }
         int choiceInt;
         while (true) {
             System.out.print("Enter the number of the transaction: ");
@@ -483,7 +495,7 @@ public class App {
                 System.err.println("Invalid input");
             }
         }
-        return choiceInt;
+        return Optional.of(choiceInt);
     }
 
     private static void printTransactions(List<Transaction> transactionList) {
