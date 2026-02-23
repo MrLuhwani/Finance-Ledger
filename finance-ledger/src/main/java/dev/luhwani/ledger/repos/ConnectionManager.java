@@ -1,8 +1,8 @@
 package dev.luhwani.ledger.repos;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -20,18 +20,31 @@ public class ConnectionManager {
 
     /*
      * run this method when you want to create the db automatically without using an
-     * sql Editor
-     * Also note that this will return an exception after running because there was
-     * no return value
-     * of the query. So run this once to create your tables, then you can delete the
+     * sql Editor. So run this once to create your tables, then you can delete the
      * call from App.java
      */
-    static void initDB() throws SQLException, IOException {
-        Connection conn = getConnection();
-        Statement stmt = conn.createStatement();
-        String sql = Files.readString(Paths.get("finance-ledger\\src\\main\\resources\\schema.sql"));
-        stmt.executeQuery(sql);
-        conn.close();
-        System.out.println("Connected sucessfullly");
+    private String loadSchema() {
+        try (InputStream inputStream = getClass().getClassLoader().getResourceAsStream("schema.sql")) {
+            if (inputStream == null) {
+                throw new RuntimeException("Schema.sql not found in resources");
+            }
+            return new String(inputStream.readAllBytes(), StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to load schema.sql", e);
+        }
+    }
+
+    public void initDB() {
+        String[] statements = loadSchema().split(";");
+        try (Connection conn = getConnection(); Statement stmt = conn.createStatement();) {
+            for (String sql : statements) {
+                if (!sql.trim().isEmpty()) {
+                    stmt.execute(sql);
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException("DB initialization failed", e);
+        }
+        System.out.println("DB sucessfullly initialized");
     }
 }
