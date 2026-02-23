@@ -43,7 +43,6 @@ FinanceLedger
 │  │     │           │  ├─ Category.java  
 │  │     │           │  ├─ EntryType.java  
 │  │     │           │  ├─ LoginData.java  
-│  │     │           │  ├─ Transaction.java  
 │  │     │           │  ├─ Transaction2.java  
 │  │     │           │  └─ User.java  
 │  │     │           ├─ repos/  
@@ -55,9 +54,6 @@ FinanceLedger
 │  │     │           │  ├─ SecurityService.java  
 │  │     │           │  ├─ UserService.java  
 │  │     │           │  └─ Utils.java  
-│  │     │           ├─ utilities/  
-│  │     │           │  ├─ CsvUtils.java  
-│  │     │           │  └─ LedgerUtils.java  
 │  │     │           └─ App.java  
 │  │     └─ resources/  
 │  │         └─ ledger.csv  
