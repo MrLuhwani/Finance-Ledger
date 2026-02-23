@@ -58,12 +58,14 @@ public class TransactionRepo {
     public void editTransaction(Transaction tr) {
         String sql = """
                 UPDATE transactions
-                SET date = ?, kobo_amt = ?, entry_type = ?, category = ?, description = ?, updated_at = NOW() ;""";
+                SET date = ?, kobo_amt = ?, entry_type = ?, category = ?, description = ?, updated_at = NOW()
+                WHERE id = ? ;""";
         LocalDate date = tr.date();
         Long koboAmt = tr.koboAmt();
         String entry = String.valueOf(tr.entryType());
         String category = String.valueOf(tr.category());
         String description = tr.description();
+        Long id = tr.id();
         try (Connection conn = ConnectionManager.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             conn.setAutoCommit(false);
             ps.setObject(1, date);
@@ -71,6 +73,7 @@ public class TransactionRepo {
             ps.setString(3, entry);
             ps.setString(4, category);
             ps.setString(5, description);
+            ps.setLong(6, id);
             ps.executeUpdate();
             conn.commit();
         } catch (SQLException e) {
