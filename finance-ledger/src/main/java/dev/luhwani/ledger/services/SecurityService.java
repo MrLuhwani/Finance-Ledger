@@ -1,15 +1,15 @@
 package dev.luhwani.ledger.services;
 
 import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.security.MessageDigest;
-import java.util.Random;
 
 import dev.luhwani.ledger.customExceptions.UIException;
 
 public class SecurityService {
 
     private static final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-    private static final Random RANDOM = new Random();
+    private static final SecureRandom RANDOM = new SecureRandom();
 
     // the upper and lower boundaries represent the range of values for a generated
     // salt
