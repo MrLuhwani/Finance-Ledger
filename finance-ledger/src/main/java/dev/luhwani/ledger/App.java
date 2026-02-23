@@ -23,7 +23,6 @@ import dev.luhwani.ledger.services.TransactionService;
 import dev.luhwani.ledger.services.SecurityService;
 import dev.luhwani.ledger.services.UserService;
 import dev.luhwani.ledger.services.Utils;
-import dev.luhwani.ledger.utilities.CsvUtils;
 import dev.luhwani.ledger.utilities.LedgerUtils;
 
 public class App {
@@ -207,7 +206,7 @@ public class App {
                     Response: """);
             response = scanner.nextLine().trim();
             switch (response) {
-                case "1" -> CsvUtils.getCSV();
+                case "1" -> printTransactions(user.getTransactions());
                 case "2" -> addTransaction(context.getTransactionService(), user);
                 case "3" -> editTransaction(context.getTransactionService(), user);
                 case "4" -> deleteTransaction(context.getTransactionService(), user);
@@ -383,15 +382,7 @@ public class App {
     }
 
     private static int chooseTransaction(List<Transaction2> transactionList) {
-        if (transactionList.isEmpty()) {
-            System.out.println("No transactions have been added yet");
-        } else {
-            System.out.println("id, Date, Amount, Category, Description");
-            int count = 1;
-            for (Transaction2 tr : transactionList) {
-                System.out.println(count + ", " + tr.toString());
-            }
-        }
+        printTransactions(transactionList);
         int choiceInt;
         while (true) {
             System.out.print("Enter the id for the transaction: ");
@@ -404,6 +395,18 @@ public class App {
             }
         }
         return choiceInt;
+    }
+
+    private static void printTransactions(List<Transaction2> transactionList) {
+        if (transactionList.isEmpty()) {
+            System.out.println("No transactions have been added yet");
+        } else {
+            System.out.println("id, Date, Amount, Category, Description");
+            int count = 1;
+            for (Transaction2 tr : transactionList) {
+                System.out.println(count + ", " + tr.toString());
+            }
+        }
     }
 
     private static void changePassword(User user, AppContext context) {
