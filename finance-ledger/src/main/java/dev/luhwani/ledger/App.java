@@ -216,9 +216,12 @@ public class App {
                 }
                 case "7" -> changePassword(user, context);
                 case "8" -> {
-                    deleteAcct(user, context.getUserService());
-                    usingSystem = false;
-                    System.out.println("Exitting program...");
+                    if (deleteAcct(user, context.getUserService())) {
+                        usingSystem = false;
+                        System.out.println("Exitting program...");   
+                    } else {
+                        System.out.println("Operation cancelled...");
+                    }
                 }
                 case "0" -> {
                     usingSystem = false;
@@ -461,7 +464,7 @@ public class App {
         }
     }
 
-    private static void deleteAcct(User user, UserService userService) {
+    private static boolean deleteAcct(User user, UserService userService) {
         while (true) {
             System.out.println("""
                     Are you sure you wish to delete your account?!
@@ -473,12 +476,12 @@ public class App {
             if (choice.equals("1")) {
                 break;
             } else if (choice.equals("2")) {
-                System.out.println("Operation cancelled...");
-                return;
+                return false;
             } else {
                 System.out.println("Invalid input!");
             }
         }
         userService.deleteUser(user.getId());
+        return true;
     }
 }
