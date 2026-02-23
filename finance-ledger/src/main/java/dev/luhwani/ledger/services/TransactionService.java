@@ -1,5 +1,6 @@
 package dev.luhwani.ledger.services;
 
+import java.util.Comparator;
 import java.util.EnumSet;
 import java.util.Optional;
 
@@ -27,6 +28,7 @@ public class TransactionService {
             Optional<Transaction> tr = repo.returnStoredTransaction(transaction);
             if (tr.isPresent()) {
                 user.addTransaction(tr.get());
+                user.getTransactions().sort(Comparator.comparing(Transaction::date).reversed());
                 return;
             }
             throw new UIException("ID couldn't be retrieved while storing transaction");

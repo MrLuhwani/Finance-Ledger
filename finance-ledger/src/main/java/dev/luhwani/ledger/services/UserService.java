@@ -1,5 +1,6 @@
 package dev.luhwani.ledger.services;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
@@ -43,6 +44,7 @@ public class UserService {
             List<Transaction> transactionList = repo.getUserTransactions(loginData.id());
             repo.setLastLogin(loginData.id());
             Optional<User> user = Optional.of(new User(loginData.id(), loginData.email(), loginData.username()));
+            transactionList.sort(Comparator.comparing(Transaction::date).reversed());
             user.get().setTransactionList(transactionList);
             return user;
         } catch (DataAccessException e) {
