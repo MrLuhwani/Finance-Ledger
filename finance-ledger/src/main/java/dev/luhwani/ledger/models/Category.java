@@ -1,6 +1,8 @@
 package dev.luhwani.ledger.models;
 
 public enum Category {
+    SALARY,
+    BUSINESS,
     FOOD,
     HOUSING,
     UTILITIES,
@@ -12,6 +14,7 @@ public enum Category {
     LOANS,
     ENTERTAINMENT,
     SHOPPING,
+    ALLOWANCES,
     GIFTS,
     MISCELLANEOUS
 }
