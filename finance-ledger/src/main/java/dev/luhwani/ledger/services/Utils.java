@@ -2,7 +2,10 @@ package dev.luhwani.ledger.services;
 
 import java.util.regex.Pattern;
 
-public class Utils {
+public final class Utils {
+
+    private Utils() {}
+    
     public static boolean validEmail(String email) {
         Pattern p = Pattern.compile("^[A-Za-z0-9]+@[A-za-z-]+\\.[A-Za-z]{2,}$");
         return p.matcher(email).matches();
