@@ -1,8 +1,12 @@
 package dev.luhwani.ledger;
 
+import java.io.IOException;
 import java.math.BigDecimal;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.Month;
+import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.format.TextStyle;
@@ -25,6 +29,8 @@ import dev.luhwani.ledger.models.User;
 import dev.luhwani.ledger.repos.TransactionRepo;
 import dev.luhwani.ledger.repos.UserRepo;
 import dev.luhwani.ledger.services.TransactionService;
+import dev.luhwani.ledger.services.ExportService;
+import dev.luhwani.ledger.services.FileNameService;
 import dev.luhwani.ledger.services.SecurityService;
 import dev.luhwani.ledger.services.UserService;
 import dev.luhwani.ledger.services.Utils;
@@ -39,7 +45,8 @@ public class App {
         SecurityService securityService = new SecurityService();
         TransactionRepo transactionRepo = new TransactionRepo();
         TransactionService transactionService = new TransactionService(transactionRepo);
-        AppContext context = new AppContext(securityService, userService, transactionService);
+        ExportService exportService = new ExportService();
+        AppContext context = new AppContext(securityService, userService, transactionService, exportService);
         startApp(context);
     }
 
@@ -217,9 +224,7 @@ public class App {
                 case "4" -> editTransaction(context.getTransactionService(), user);
                 case "5" -> deleteTransaction(context.getTransactionService(), user);
                 case "6" -> monthlySummary(user.getTransactions());
-                case "7" -> {
-                    System.out.println("Expor to CSV");
-                }
+                case "7" -> exportSummary(user.getTransactions(), context.getExportService());
                 case "8" -> changePassword(user, context);
                 case "9" -> {
                     if (deleteAcct(user, context.getUserService())) {
@@ -239,6 +244,10 @@ public class App {
     }
 
     private static void filterByCategory(List<Transaction> transactions, TransactionService transactionService) {
+        if (transactions.isEmpty()) {
+            System.out.println("No transaction's saved");
+            return;
+        }
         EnumSet<Category> categorySet = transactionService.getCategories();
         int count = 0;
         System.out.println("__Categories__");
@@ -375,11 +384,50 @@ public class App {
         BigDecimal maxInc = BigDecimal.valueOf(maxIncKobo).divide(BigDecimal.valueOf(100));
         System.out.println("Summary for the Month of " + monthName + ": ");
         printTransactions(filteredTransactions);
+        BigDecimal net = totalInc.subtract(totalExp);
         System.out.println("Total income: " + totalInc);
         System.out.println("Total Expense: " + totalExp);
+        System.out.println("Net balalnce: " + net);
         System.out.println("Highest income: " + maxInc);
         System.out.println("Highest expense: " + maxExp);
         System.out.println("Summary Completed");
+    }
+
+    private static void exportSummary(List<Transaction> transactions, ExportService exportService) {
+        if (transactions.isEmpty()) {
+            System.out.println("No transaction's saved");
+            return;
+        }
+        List<Transaction> filteredTransactions;
+        YearMonth ym;
+        while (true) {
+            try {
+                System.out.print("Enter the number of the monthNum you wish to check (1-12): ");
+                String month = scanner.nextLine();
+                int currentYear = LocalDate.now().getYear();
+                int monthNum = Utils.validIntChoice(month, 12);
+                filteredTransactions = transactions.stream()
+                        .filter(t -> t.date().getMonthValue() == monthNum && t.date().getYear() == currentYear)
+                        .collect(Collectors.toList());
+                if (filteredTransactions.isEmpty()) {
+                    System.out.println("No records for this month!");
+                    return;
+                }
+                ym = YearMonth.of(currentYear, monthNum);
+                break;
+            } catch (NumberFormatException | IndexOutOfBoundsException e) {
+                System.out.println("Invalid input!");
+            }
+        }
+        Path exportDir = Paths.get("exports");
+        Path desired = exportDir.resolve("summary-" + ym + ".csv");
+        try {
+            Path outFile = FileNameService.uniquePath(desired);
+            exportService.exportMonthlySummaryCsv(filteredTransactions, ym, outFile);
+            System.out.println("CSV exported to: " + outFile.toAbsolutePath());
+        } catch (IOException e) {
+            System.out.println("Error exporting summary: " + e.getMessage());
+        }
     }
 
     private static Transaction getTransactionDetails(User user, TransactionService transactionService,
